@@ -180,7 +180,7 @@ pointer out of the way when the cursor is near it.
 #+end_src
 
 ** Eshell
-Enable Plan 9′s terminal, the Eshell smart display
+Enable Plan 9's terminal, the Eshell smart display
 #+begin_src emacs-lisp
 (require 'eshell)
 (require 'em-smart)
@@ -513,7 +513,7 @@ Syntax highlighting mode for TableGen description files (tablegen-mode.el).
 Every Lisp needs a pretty lambda character.
 #+begin_src emacs-lis
 (defun ue-pretty-lambdas ()
-  "Display the word “lambda” by “λ”."
+  "Display the word "lambda" by "λ"."
   (font-lock-add-keywords
    nil
    `(("\\(lambda\\>\\)"
