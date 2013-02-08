@@ -311,12 +311,19 @@ Set the name of the file where new notes will be stored.
 #+end_src
 
 * Deft
+
 #+begin_src emacs-lisp
      (setq deft-directory "~/Dropbox/org/deft")
      (setq deft-use-filename-as-title t)
      (setq deft-extension "org")
      (setq deft-text-mode 'org-mode)
    #+end_src
+* LaTeX
+Invoke the AUCTeX package.
+#+begin_src emacs-lisp
+(require 'tex-site)
+#+end_src
+
 * Magit
 Bind C-x g to magit-status and show magit status in full screen.
 #+begin_src emacs-lisp
