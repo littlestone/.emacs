@@ -566,8 +566,19 @@ Enable =slime= for Lisp.
 Enable =geiser= and =quack= for scheme/racket.
 #+begin_src emacs-lisp
 (setq geiser-active-implementations '(racket))
-(require 'quack)
-(setq quack-global-menu-p nil)
+
+;; quack mode settings for scheme
+(autoload 'quack "quack" nil t)
+
+;; This hook lets you use your theme colours instead of quack's ones.
+(defun scheme-mode-quack-hook ()
+  (setq quack-global-menu-p nil)
+  ;;(require 'quack)
+  (quack-pretty-lambda-p t)
+  (setq quack-fontify-style 'emacs))
+
+(add-hook 'scheme-mode-hook 'scheme-mode-quack-hook)
+
 #+end_src
 
 *** Clojure
