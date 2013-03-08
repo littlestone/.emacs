@@ -256,6 +256,11 @@ F3 Help.
       x-select-enable-clipboard t)
 #+end_src
 
+* Auto complete
+#+begin_src emacs-lisp
+(require 'auto-complete-config)
+(ac-config-default)
+#+end_src
 * Org mode
 #+begin_src emacs-lisp
 (require 'ob-tangle)
@@ -345,6 +350,11 @@ Bind C-x g to magit-status and show magit status in full screen.
 ;(define-key magit-status-mode-map (kbd "q") 'magit-quit-session)
 #+end_src
 
+** Git gutter
+#+begin_src emacs-lisp
+(global-git-gutter-mode t)
+#+end_src
+
 * IDO
 Ido stands for Interactively Do Things.
 =ido-ubiquitous= takes the power of ido and lets you use it almost everywhere.
@@ -358,7 +368,14 @@ from my buffer search.
         ido-use-virtual-buffers t)
 #+end_src
 
-
+* Helm
+#+begin_src emacs-lisp
+(require 'helm-config)
+#+end_src
+* Autopair-mode
+#+begin_src emacs-lisp
+(require 'autopair)
+#+end_src
 * Supercharge recentf by adding Ido mode support
 #+begin_src emacs-lisp
 (require 'recentf)
@@ -411,12 +428,17 @@ history and completion.
 (require 'sunrise-commander)
 #+end_src
 
+
+* Projectile
+#+begin_src emacs-lisp
+(projectile-global-mode)
+#+end_src
 * Yasnippets
 Enable yasnippet
 #+begin_src emacs-lisp
 (require 'yasnippet)
 (yas/global-mode 1)
-(yas/load-directory "~/.emacs.d/elpa/yasnippet-20121225.430/snippets")
+(yas/load-directory "~/.emacs.d/elpa/yasnippet-20130218.2229/snippets")
 #+end_src
 
 * Programming
