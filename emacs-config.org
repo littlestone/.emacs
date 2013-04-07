@@ -206,7 +206,8 @@ Always do syntax highlighting and require newline and stop at the last line.
 ;(add-hook 'before-save-hook 'delete-trailing-whitespace)
 (add-hook 'after-save-hook 'delete-trailing-whitespace)
 (setq fill-column 80)
-(global-hl-line-mode 1)
+(global-hl-line-mode +1)
+(electric-indent-mode +1)
 #+end_src
 
 Also indent automagical by switching RET and LF.
@@ -460,7 +461,7 @@ Enable yasnippet
 (add-hook 'sh-mode-hook       'flyspell-prog-mode 1)
 (add-hook 'c-mode-common-hook 'turn-on-auto-fill)
 (add-hook 'c++-mode-common-hook ' turn-on-auto-fill)
-
+(add-hook 'prog-mode-hook 'flyspell-prog-mode 1)
 #+end_src
 
 ** C/C++
