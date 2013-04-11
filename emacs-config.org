@@ -349,6 +349,7 @@ Bind C-x g to magit-status and show magit status in full screen.
   (jump-to-register :magit-fullscreen))
 
 ;(define-key magit-status-mode-map (kbd "q") 'magit-quit-session)
+(setq ediff-split-window-function 'split-window-horizontally)
 #+end_src
 
 * Git gutter
