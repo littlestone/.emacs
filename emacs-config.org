@@ -120,6 +120,15 @@ Make Emacs to fully redraw the display before it processes queued input events.
 (setq redisplay-dont-pause t)
 #+end_src
 
+Powerline
+#+begin_src emacs-lisp
+(require 'powerline)
+(setq powerline-color1 "#222")
+(setq powerline-color2 "#444")
+(setq powerline-arrow-shape 'arrow)
+#+end_src
+
+
 ** Frame font, title and size
 #+begin_src emacs-lisp
 (if window-system (set-frame-font "Menlo-10"))
@@ -309,7 +318,7 @@ Set the location of the =org= files on the local system, and the Dropbox
 root directory.
 #+begin_src emacs-lisp
 (setq org-directory "~/org")
-(setq org-mobile-directory "~/Dropbox/MobileOrg")
+(setq org-mobile-directory "~/Dropbox/Apps/MobileOrg")
 #+end_src
 Set the name of the file where new notes will be stored.
 #+begin_src emacs-lisp
@@ -449,6 +458,8 @@ Enable yasnippet
 (require 'yasnippet)
 (yas/global-mode 1)
 (yas/load-directory "~/.emacs.d/elpa/yasnippet-20130218.2229/snippets")
+(setq yas/root-directory "~/.emacs.d/snippets")
+(yas/load-directory yas/root-directory)
 #+end_src
 
 * Programming
