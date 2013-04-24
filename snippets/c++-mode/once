@@ -1,0 +1,27 @@
+# -*- mode: snippet -*-
+# name: #ifndef XXX; #define XXX; #endif
+# key: ifdef
+# contributor: Ulf Ejlertsson <ulf.ejlertsson@gmail.com>
+#
+# This snippet inserts #define guards.
+#
+# If your header file is nested in a /src/ or /include/ directory, the guard
+# will be named to reflect the location of your header in relation to that
+# directory. For example, if your file is "proj/include/proj/util/foo.h" then
+# the guard will be named "__PROJ_UTIL_FOO_H_INCLUDED__".
+#
+# --
+
+#ifndef ${1:__`(let ((path (file-name-sans-extension (buffer-file-name))))
+               (upcase
+                (replace-regexp-in-string
+                 "/" "_" (if (string-match "/\\\(src\\\|includes?\\\)/\\\(.+\\\)$" path)
+                             (match-string 2 path)
+                           (file-name-nondirectory path))))
+			   )
+			   `}_${2:`(upcase (file-name-extension (file-name-nondirectory (buffer-file-name))))`}_INCLUDED__
+#define $1_$2_INCLUDED__
+
+$0
+
+#endif  // !$1_$2_INCLUDED__
