@@ -417,6 +417,12 @@ from my buffer search.
     (message "Aborting")))
 #+end_src
 
+* Ace Jump mode
+  #+begin_src emacs-lisp
+(require 'ace-jump-mode)
+    (define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
+#+end_src
+
 * Undo tree
 #+begin_src emacs-lisp
 (require 'undo-tree)
@@ -474,6 +480,11 @@ Enable yasnippet
 (add-hook 'c-mode-common-hook 'turn-on-auto-fill)
 (add-hook 'c++-mode-common-hook ' turn-on-auto-fill)
 (add-hook 'prog-mode-hook 'flyspell-prog-mode 1)
+#+end_src
+
+SCons
+#+begin_src emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.scons$" . python-mode))
 #+end_src
 
 ** C/C++
@@ -574,6 +585,7 @@ Every Lisp needs a pretty lambda character.
 
 (add-hook 'emacs-lisp-mode-hook 'ue-pretty-lambdas)
 (add-hook 'lisp-mode-hook 'ue-pretty-lambdas)
+(add-hook 'after-save-hook 'check-parens)
 #+end_src
 
 Enable rainbow delimiters.
