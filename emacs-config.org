@@ -458,6 +458,8 @@ history and completion.
 #+begin_src emacs-lisp
 (projectile-global-mode)
 #+end_src
+
+
 * Yasnippets
 Enable yasnippet
 #+begin_src emacs-lisp
@@ -851,6 +853,16 @@ Setup Erlang mode.
 (add-hook 'tuareg-mode-hook
 	  ;; Turn on auto-fill minor mode.
 	  (lambda () (auto-fill-mode 1)))
+#+end_src
+
+*** Coq
+#+begin_src emacs-lisp
+(setq auto-mode-alist (remove (rassoc 'verilog-mode auto-mode-alist) auto-mode-alist))
+;;(load-file (concat site-packages-dir "/ProofGeneral/generic/proof-site.el"))
+(setq coq-prog-name "/usr/local/bin/coqtop")
+(setq auto-mode-alist (cons '("\.v$" . coq-mode) auto-mode-alist))
+(add-to-list 'load-path "/usr/local/lib/emacs/site-lisp")
+(autoload 'coq-mode "coq" "Major mode for editing Coq vernacular." t)
 #+end_src
 
 ** Python
