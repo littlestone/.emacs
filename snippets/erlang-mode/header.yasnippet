@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: header
+# key: ifdef
+# --
+
+-ifndef(__${1:`(upcase (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))`_HRL_INCLUDED}).
+-define(__$1, true).
+
+$0
+
+-endif. % __$1

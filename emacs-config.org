@@ -1,11 +1,14 @@
 #+TITLE: Emacs Configuration
 #+AUTHOR: Ulf Ejlertsson
-#+EMAIL: ulf.ejlertsson@gmail.com
-#+OPTIONS: toc:3 num:nil
+#+EMAIL: ulf.ejlertsson
 
-Emacs does not have namespaces, so I emulate Clojure namespaces by
-using this prefix =ue=
+#+begin_quote
+Emacs outshines all other editing software in approximately the same
+way that the noonday sun does the stars. It is not just bigger and
+brighter; it simply makes everything else vanish.
 
+-- Neal Stephenson, "In the Beginning was the Command Line"
+#+end_quote
 
 
 * Set personal info explicit.
@@ -14,71 +17,85 @@ using this prefix =ue=
 (setq user-mail-address "ulf.ejlertsson@gmail.com")
 #+end_src
 
-* Basic configuration
+* Winner Mode
+Winner mode is great when you depend a lot on working with Emacs windows.
+#begin_src emacs-lisp
+(use-package winner
+  :diminish winner-mode
+  :if (not noninteractive)
+  :init
+  (progn
+    (winner-mode 1)
 
-** The power of Common Lisp
-#+begin_src emacs-lisp
-(require 'cl)
+    (bind-key "M-N" 'winner-redo)
+    (bind-key "M-P" 'winner-undo)))
 #+end_src
 
-** Misc utilites
-Make Emacs reload changed files if you haven't also changed them in
-Emacs (=global-auto-revert-mode=).
-Winner Mode is great when you depend a lot on working with Emacs windows.
+* Auto revert
+Make Emacs reload changed files if you haven't also changed them in Emacs.
 #+begin_src emacs-lisp
 (global-auto-revert-mode t)
-(winner-mode t)
 #+end_src
-Enable ANSI colors for the shell by default.
+
+* Remap meta key on OS X
 #+begin_src emacs-lisp
-(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+(setq mac-option-modifier nil
+      mac-command-modifier 'meta
+      x-select-enable-clipboard t)
 #+end_src
 
-Reload =.emacs= file (useful for editing .emacs itself :)
+* Useful macro
+from: http://milkbox.net/note/single-file-master-emacs-configuration/
 #+begin_src emacs-lisp
-(defun reload-dotemacs ()
-  "Reload .emacs"
-  (interactive)
-  (load-file "~/.emacs.d/init.el"))
-(global-set-key "\M-e" 'reload-dotemacs)
+;;;; macros
+(defmacro after (mode &rest body)
+  "`eval-after-load' MODE evaluate BODY."
+  (declare (indent defun))
+  `(eval-after-load ,mode
+     '(progn ,@body)))
 #+end_src
 
-
-* Packages
+* Required packages
 #+begin_src emacs-lisp
-(require 'package)
-(add-to-list 'package-archives
-             '("marmalade" . "http://marmalade-repo.org/packages/") t)
-(add-to-list 'package-archives
-             '("melpa" . "http://melpa.milkbox.net/packages/") t)
-(package-initialize)
+(require 'use-package)
+(eval-when-compile
+  (setq use-package-verbose (null byte-compile-current-file)))
+
+(require 'git)
+(require 'cl)
+(require 'eshell)
+(require 'em-smart)
+(require 'yasnippet)
+(require 'flx-ido)
+(require 'ansi-color) 
+(require 'helm-config)
 #+end_src
 
-* Startup options
-** Spash screen
+* Spash screen
 Turn of splash screen and the message.
 #+begin_src emacs-lisp
 (setq inhibit-splash-screen t
       initial-scratch-message nil)
 #+end_src
 
-** No beeping and 'y' for yes.
+* No beeping and 'y' for yes.
 #+begin_src emacs-lisp
 (setq visible-bell t)
 (fset 'yes-or-no-p 'y-or-n-p)
 #+end_src
 
-** Scroll bar, tool bar and menu bar
+* Scroll bar, tool bar and menu bar
 Disable tool bar, the rest is fine on OSX
 #+begin_src emacs-lisp
 (when window-system
   (tool-bar-mode -1))
 #+end_src
 
-** Setting up the Emacs server
+* Setting up the Emacs server
 #+begin_src emacs-lisp
 (server-start)
 #+end_src
+   
 
 * Paths
 Add the ~/bin to the Emacs shell path and fix the PATH variable on OS X
@@ -93,6 +110,39 @@ Add the ~/bin to the Emacs shell path and fix the PATH variable on OS X
 (if window-system (set-exec-path-from-shell-PATH))
 #+end_src
 
+* Zenburn theme
+#+begin_src emacs-lisp
+(use-package zenburn-theme)
+#+end_src
+
+* Yasnippet
+#+begin_src emacs-lisp
+(use-package yasnippet
+  :init
+  (progn
+    (let ((snippets-dir (f-expand "snippets" user-emacs-directory)))
+      (yas/load-directory snippets-dir)
+      (setq yas/snippet-dirs snippets-dir))
+    (yas-global-mode 1)
+    (setq-default yas/prompt-functions '(yas/ido-prompt))))
+#+end_src
+
+* ANSI color
+Enable ANSI colors for the shell by default.
+#+begin_src emacs-lisp
+(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+#+end_src
+
+* Reload emacs
+Reload =.emacs= file (useful for editing .emacs itself :)
+#+begin_src emacs-lisp
+(defun reload-dotemacs ()
+  "Reload .emacs"
+  (interactive)
+  (load-file "~/.emacs.d/init.el"))
+(global-set-key "\M-e" 'reload-dotemacs)
+#+end_src
+
 * Display settings
 Set the default font, and set transparency.
 #+begin_src emacs-lisp
@@ -100,10 +150,9 @@ Set the default font, and set transparency.
 (setq mac-allow-anti-aliasing t)
 (set-frame-parameter (selected-frame) 'alpha '(96 84))
 (add-to-list 'default-frame-alist '(alpha 96 84))
-(load-theme 'zenburn t)
 #+end_src
 
-Toggle transparency.
+** Toggle transparency.
 #+begin_src emacs-lisp
 (defun toggle-transparency ()
   (interactive)
@@ -112,22 +161,12 @@ Toggle transparency.
         (set-frame-parameter nil 'alpha '(100 100))
       (set-frame-parameter nil 'alpha '(85 50)))))
 (global-set-key (kbd "C-c t") 'toggle-transparency)
-
 #+end_src
 
-Make Emacs to fully redraw the display before it processes queued input events.
+** Make Emacs to fully redraw the display before it processes queued input events.
 #+begin_src emacs-lisp
 (setq redisplay-dont-pause t)
 #+end_src
-
-Powerline
-#+begin_src emacs-lisp
-(require 'powerline)
-(setq powerline-color1 "#222")
-(setq powerline-color2 "#444")
-(setq powerline-arrow-shape 'arrow)
-#+end_src
-
 
 ** Frame font, title and size
 #+begin_src emacs-lisp
@@ -137,7 +176,7 @@ Powerline
                 (abbreviate-file-name (buffer-file-name))
                   "%b")))))
 (if (window-system)
-  (set-frame-width (selected-frame) 190))
+  (set-frame-width (selected-frame) 200))
 
 (defun lh-get-height-max ()
   (- (/ (cadddr (display-usable-bounds))
@@ -150,6 +189,7 @@ Powerline
 (lh-max-frames)
 #+end_src
 
+
 Make buffer names unique.
 #+begin_src emacs-lisp
 (require 'uniquify)
@@ -158,119 +198,180 @@ Make buffer names unique.
   uniquify-separator ":")
 #+end_src
 
-** Lines, columns, and parenthesis
-Display the column number and line number i mode-line and also
-highlight matching parenthesis.
+
+
+
+* Smex
 #+begin_src emacs-lisp
-(column-number-mode 1)
-(line-number-mode t)
-(setq show-paren-delay 0
-      show-paren-style 'parenthesis)
-(show-paren-mode 1)
+(use-package smex
+  :init (smex-initialize)
+  :bind ("M-x" . smex))
 #+end_src
 
-** Time and date
-Set the time format to 24hr format and display time, date and load
-in the mode-line
+* Multiple cursors
 #+begin_src emacs-lisp
-(setq display-time-day-and-date t)
-(setq display-time-24hr-format t)
-(display-time-mode 1)
+(use-package multiple-cursors
+  :bind (("C->" . mc/mark-next-like-this)
+         ("C-<" . mc/mark-previous-like-this)))
 #+end_src
 
-** Mouse and scrolling
-Turn off native OSX scrolling while in terminal mode. Move the mouse
-pointer out of the way when the cursor is near it.
+* Popwin
 #+begin_src emacs-lisp
-;(when window-system
-;  (mouse-wheel mode t))
-(set-variable 'scroll-conservatively 5)
-(mouse-avoidance-mode 'cat-and-mouse)
+(use-package popwin
+  :config (setq display-buffer-function 'popwin:display-buffer))
 #+end_src
 
-** Eshell
-Enable Plan 9's terminal, the Eshell smart display
+* Projectile
+http://batsov.com/projectile/
 #+begin_src emacs-lisp
-(require 'eshell)
-(require 'em-smart)
-(setq eshell-where-to-jump 'begin)
-(setq eshell-review-quick-commands nil)
-(setq eshell-smart-space-goes-to-end t)
+(use-package projectile
+  :init (projectile-global-mode 1)
+  :config
+  (progn
+    (setq projectile-enable-caching t)
+    (setq projectile-require-project-root nil)
+    (setq projectile-completion-system 'ido)
+    (add-to-list 'projectile-globally-ignored-files ".DS_Store")))
 #+end_src
 
-Fix terminal in emacs (M-x term) under MacOS. Use Emacs terminfo, not system terminfo.
+* Magit
+Key bindings =Ctrl-x g= for /magit-status/ and =Ctrl-c Ctrl-a= for /magit-just-amend/
+http://magit.github.io/magit/
 #+begin_src emacs-lisp
-(setq system-uses-terminfo nil)
+(use-package magit
+  :init
+  (progn
+    (use-package magit-blame)
+    (bind-key "C-c C-a" 'magit-just-amend magit-mode-map))
+  :config
+  (progn    
+    (setq magit-default-tracking-name-function 'magit-default-tracking-name-branch-only)
+    (setq magit-set-upstream-on-push t)
+    (setq magit-completing-read-function 'magit-ido-completing-read)
+    (setq magit-stage-all-confirm nil)
+    (setq magit-unstage-all-confirm nil)
+    (add-hook 'magit-mode-hook 'rinari-launch))
+  :bind ("C-x g" . magit-status))
 #+end_src
 
-
-** Basic text editing
-Always do syntax highlighting and require newline and stop at the last line.
+* Git gutter
 #+begin_src emacs-lisp
-(setq default-major-mode 'text-mode)
-(global-font-lock-mode 1)
-(setq require-final-newline t)
-(setq next-line-add-newlines nil)
-(setq whitespace-style '(trailing space-before-tab indentation empty space-after-tab))
-;(add-hook 'before-save-hook 'delete-trailing-whitespace)
-(add-hook 'after-save-hook 'delete-trailing-whitespace)
-(setq fill-column 80)
-(global-hl-line-mode +1)
-(electric-indent-mode +1)
+(use-package git-gutter+
+  :diminish git-gutter+-mode
+  :config
+  (progn
+    (use-package git-gutter-fringe+
+      :config
+      (git-gutter-fr+-minimal))
+    (global-git-gutter+-mode 1)))
 #+end_src
 
-Also indent automagical by switching RET and LF.
+* Ace jump
 #+begin_src emacs-lisp
-(setq foo (global-key-binding "\C-m"))
-(global-set-key "\C-m" (global-key-binding "\C-j"))
-(global-set-key "\C-j" foo)
+(use-package ace-jump-mode
+  :bind ("C-c SPC" . ace-jump-mode))
 #+end_src
 
-Hightlight marked region.
+* Uniquify
+Make buffer names unique.
 #+begin_src emacs-lisp
-(transient-mark-mode t)
+(use-package uniquify
+  :config (setq uniquify-buffer-name-style 'post-forward
+                uniquify-separator ":"))
 #+end_src
 
-Fci-mode.
+* Eshell
+Enable /Plan 9/'s terminal, the eshell smart display with =Meta-e=.
 #+begin_src emacs-lisp
-(require 'fill-column-indicator)
-(setq fci-rule-width 2)
-(setq fci-rule-color "#5b605e")
-
-(define-globalized-minor-mode
-  global-fci-mode fci-mode (lambda () (fci-mode 1)))
-(global-fci-mode 1)
+(use-package eshell
+  :bind ("M-e" . eshell)
+  :init
+  (add-hook 'eshell-first-time-mode-hook
+            (lambda ()
+              (add-to-list 'eshell-visual-commands "htop")))
+  :config
+  (progn
+    (setq eshell-history-size 5000)
+    (setq eshell-save-history-on-exit t)
+    (setq eshell-where-to-jump 'begin)
+    (setq eshell-review-quick-commands nil)
+    (setq eshell-smart-space-goes-to-end t)
+))
 #+end_src
 
-* Key mapping
-F1 go to man page.
+* Dash
 #+begin_src emacs-lisp
-(global-set-key [(f1)] (lambda () (interactive) (manual-entry
-(current-word) ) ) )
+(use-package dash
+  :config (dash-enable-font-lock))
+#+end_src
+  
+* Dired
+#+begin_src emacs-lisp
+(use-package dired-x)
 #+end_src
 
-F2 find file.
+* IDO
+Ido stands for Interactively Do Things.
+=ido-ubiquitous= takes the power of ido and lets you use it almost everywhere.
+=ido-enable-flex-matching= gives me fuzzy-finding and
+=ido-use-virtual-buffers= lets me switch to (and re-open) closed buffers
+from my buffer search.
 #+begin_src emacs-lisp
-(global-set-key [f2] 'find-file)
+(use-package ido
+  :init (ido-mode 1)
+  :config
+  (progn
+    (setq ido-case-fold t)
+    (setq ido-everywhere t)
+    (setq ido-enable-prefix nil)
+    (setq ido-enable-flex-matching t)
+    (setq ido-ubiquitous t)
+    (setq ido-use-virtual-buffers t)
+    (setq ido-create-new-buffer 'always)
+    (setq ido-max-prospects 10)
+    (setq ido-file-extensions-order '(".erl" ".el" ".hs" ".ml"))
+    (add-to-list 'ido-ignore-files "\\.DS_Store")))
+
+(use-package ido-vertical-mode
+  :init (ido-vertical-mode 1))
 #+end_src
 
-F3 Help.
+* Helm
 #+begin_src emacs-lisp
-(global-set-key [f3] 'help-command)
-#+end_src
-
-** Remap meta key on OS X
-#+begin_src emacs-lisp
-(setq mac-option-modifier nil
-      mac-command-modifier 'meta
-      x-select-enable-clipboard t)
+(use-package helm-config
+  :init
+  (progn
+    (bind-key "C-c M-x" 'helm-M-x)
+    (bind-key "C-h a" 'helm-c-apropos)
+    (bind-key "M-s a" 'helm-do-grep)
+    (bind-key "M-s b" 'helm-occur)
+    (bind-key "M-s F" 'helm-for-files)))
 #+end_src
 
 * Auto complete
 #+begin_src emacs-lisp
-(require 'auto-complete-config)
-(ac-config-default)
+(use-package auto-complete-config
+  :init
+    (ac-config-default))
 #+end_src
+
+* Smart parens
+#+begin_src emacs-lisp
+(use-package smartparens
+  :init
+  (progn
+    (use-package smartparens-config)
+    (smartparens-global-mode 1)
+    (show-smartparens-global-mode 1))
+  :config     
+  (progn
+    (require 'smartparens-config)
+    (setq smartparens-strict-mode t)))
+#+end_src
+
+* TODOS
+
+
 * Org mode
 #+begin_src emacs-lisp
 (require 'ob-tangle)
@@ -333,69 +434,15 @@ Set the name of the file where new notes will be stored.
      (setq deft-extension "org")
      (setq deft-text-mode 'org-mode)
    #+end_src
+
 * LaTeX
 Invoke the AUCTeX package.
 #+begin_src emacs-lisp
-(require 'tex-site)
+;;(require 'tex-site)
 #+end_src
 
-* Magit
-Bind C-x g to magit-status and show magit status in full screen.
-#+begin_src emacs-lisp
-(eval-after-load 'magit '(require 'magit))
 
-(global-set-key (kbd "C-x g") 'magit-status)
-
-(defadvice magit-status (around magit-fullscreen activate)
-  (window-configuration-to-register :magit-fullscreen)
-  ad-do-it
-  (delete-other-windows))
-
-(defun magit-quit-session ()
-  "Restores the previous window configuration and kills the magit buffer"
-  (interactive)
-  (kill-buffer)
-  (jump-to-register :magit-fullscreen))
-
-;(define-key magit-status-mode-map (kbd "q") 'magit-quit-session)
-(setq ediff-split-window-function 'split-window-horizontally)
-#+end_src
-
-* Git gutter
-#+begin_src emacs-lisp
-(global-git-gutter-mode t)
-(setq git-gutter:modified-sign "  ") ;; two space
-(setq git-gutter:added-sign "++")    ;; multiple character is OK
-(setq git-gutter:deleted-sign "--")
-
-(set-face-background 'git-gutter:modified "purple") ;; background color
-(set-face-foreground 'git-gutter:added "green")
-(set-face-foreground 'git-gutter:deleted "red")
-(setq git-gutter:window-width 2)
-#+end_src
-
-* IDO
-Ido stands for Interactively Do Things.
-=ido-ubiquitous= takes the power of ido and lets you use it almost everywhere.
-=ido-enable-flex-matching= gives me fuzzy-finding and
-=ido-use-virtual-buffers= lets me switch to (and re-open) closed buffers
-from my buffer search.
-#+begin_src emacs-lisp
-  (ido-mode t)
-  (ido-ubiquitous t)
-  (setq ido-enable-flex-matching t
-        ido-use-virtual-buffers t)
-#+end_src
-
-* Helm
-#+begin_src emacs-lisp
-(require 'helm-config)
-#+end_src
-* Autopair-mode
-#+begin_src emacs-lisp
-(require 'autopair)
-#+end_src
-* Supercharge recentf by adding Ido mode support
+* Recentf
 #+begin_src emacs-lisp
 (require 'recentf)
 
@@ -415,31 +462,18 @@ from my buffer search.
   (if (find-file (ido-completing-read "Find recent file: " recentf-list))
       (message "Opening file...")
     (message "Aborting")))
-#+end_src
 
-* Ace Jump mode
-  #+begin_src emacs-lisp
-(require 'ace-jump-mode)
-    (define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
 #+end_src
 
 * Undo tree
 #+begin_src emacs-lisp
 (require 'undo-tree)
+(after 'undo-tree-autoloads
+  (global-undo-tree-mode t)
+  (setq undo-tree-visualizer-relative-timestamps t)
+  (setq undo-tree-visualizer-timestamps t))
 #+end_src
 
-* Smex
-Smex is a replacement for the default behavior of =M-x= with better
-history and completion.
-#+begin_src emacs-lisp
-  (require 'smex)
-  (setq smex-save-file (expand-file-name ".smex-items" user-emacs-directory))
-  (smex-initialize)
-  (global-set-key (kbd "M-x") 'smex)
-  (global-set-key (kbd "M-X") 'smex-major-mode-commands)
-  ;; This is your old M-x.
-  (global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
-#+end_src
 
 * Ack
 =ack= is an enhanced grep.
@@ -448,27 +482,6 @@ history and completion.
   (setq ack-executable (executable-find "ack-grep"))
 #+end_src
 
-* Sunrise Commander
-#+begin_src emacs-lisp
-(require 'sunrise-commander)
-#+end_src
-
-
-* Projectile
-#+begin_src emacs-lisp
-(projectile-global-mode)
-#+end_src
-
-
-* Yasnippets
-Enable yasnippet
-#+begin_src emacs-lisp
-(require 'yasnippet)
-(yas/global-mode 1)
-(yas/load-directory "~/.emacs.d/elpa/yasnippet-20130218.2229/snippets")
-(setq yas/root-directory "~/.emacs.d/snippets")
-(yas/load-directory yas/root-directory)
-#+end_src
 
 * Programming
 
@@ -593,7 +606,9 @@ Every Lisp needs a pretty lambda character.
 Enable rainbow delimiters.
 #+begin_src emacs-lisp
 (require 'rainbow-delimiters)
-(global-rainbow-delimiters-mode)
+(after 'rainbow-delimiters-autoloads
+  (add-hook 'prog-mode-hook 'rainbow-delimiters-mode-enable))
+;(global-rainbow-delimiters-mode)
 #+end_src
 
 Enable 'hightlight-parentheses-mode'.
@@ -608,15 +623,15 @@ Enable =paredit=.
 
 Shen-mode.
 #+begin_src emacs-lisp
-(require 'shen-mode)
-(require 'inf-shen) ; <- for interaction with an external shen process
+;(require 'shen-mode)
+;(require 'inf-shen) ; <- for interaction with an external shen process
 #+end_src
 
 *** Common Lisp
 Enable =slime= for Lisp.
 #+begin_src emacs-lisp
-(setq inferior-lisp-program "/Applications/Clozure\ CL.app")
-     (require 'slime-autoloads)
+;(setq inferior-lisp-program "/Applications/Clozure\ CL.app")
+;     (require 'slime-autoloads)
 #+end_src
 
 *** Racket/Scheme
@@ -638,98 +653,6 @@ Enable =geiser= and =quack= for scheme/racket.
 
 #+end_src
 
-*** Clojure
-Enable =clojure-mode= and =nrepl=.
-#+begin_src emacs-lisp
-(require 'clojure-mode)
-(require 'nrepl)
-
-(require 'ac-nrepl)
-(add-hook 'nrepl-mode-hook 'ac-nrepl-setup)
-(add-hook 'nrepl-interaction-mode-hook 'ac-nrepl-setup)
-(eval-after-load "auto-complete"
-  '(add-to-list 'ac-modes 'nrepl-mode))
-
-(defun set-auto-complete-as-completion-at-point-function ()
-  (setq completion-at-point-functions '(auto-complete)))
-(add-hook 'auto-complete-mode-hook 'set-auto-complete-as-completion-at-point-function)
-
-(add-hook 'nrepl-mode-hook 'set-auto-complete-as-completion-at-point-function)
-(add-hook 'nrepl-interaction-mode-hook 'set-auto-complete-as-completion-at-point-function)
-
-(define-key nrepl-interaction-mode-map (kbd "C-c C-d") 'ac-nrepl-popup-doc)
-
-(add-hook 'clojure-mode-hook
-          (lambda ()
-            (setq inferior-lisp-program "lein repl")))
-
-(add-hook 'clojure-mode-hook
-	  (lambda ()
-	    (paraedit-mode +1)))
-#+end_src
-Enable =auto-fill= mode.
-#+begin_src emacs-lisp
-(add-hook 'clojure-mode-hook 'auto-fill-mode)
-#+end_src
-
-Due to syntax differences with other Lisp-like languages, Clojure is
-better suited to a =fill-column= value of 80.
-#+begin_src emacs-lisp
-(add-hook 'clojure-mode-hook (lambda () (set-fill-column 80)(fci-mode)))
-#+end_src
-
-Clojure needs some help with indenting.
-#+begin_src emacs-lisp
-(put 'match 'clojure-indent-function 1)
-(put 'if 'clojure-indent-function 0) ;; Really??
-#+end_src
-
-Enable =eldoc= in clojure buffers.
-#+begin_src emacs-lisp
-(add-hook 'nrepl-interaction-mode-hook
-  'nrepl-turn-on-eldoc-mode)
-#+end_src
-
-Stop the error buffer from popping up while working in the =REPL= buffer.
-#+begin_src emacs-lisp
-(setq nrepl-popup-stacktraces nil)
-#+end_src
-
-Make =C-c C-z= switch to the =*nrepl*= buffer in the current window.
-#+begin_src emacs-lisp
-(add-to-list 'same-window-buffer-names "*nrepl*")
-#+end_src
-
-Turn on the =paredit= for clojure.
-#+begin_src emacs-lisp
-(defun turn-on-paredit () (paredit-mode 1))
-(add-hook 'clojure-mode-hook 'turn-on-paredit)
-(add-hook 'nrepl-mode-hook 'paredit-mode)
-#+end_src
-
-Add some bling.
-#+begin_src emacs-lisp
-(eval-after-load 'clojure-mode
-  '(font-lock-add-keywords
-    'clojure-mode `(("(\\(fn\\)[\[[:space:]]"
-                     (0 (progn (compose-region (match-beginning 1)
-                                               (match-end 1) "λ")
-                               nil))))))
-
-(eval-after-load 'clojure-mode
-  '(font-lock-add-keywords
-    'clojure-mode `(("\\(#\\)("
-                     (0 (progn (compose-region (match-beginning 1)
-                                               (match-end 1) "ƒ")
-                               nil))))))
-
-(eval-after-load 'clojure-mode
-  '(font-lock-add-keywords
-    'clojure-mode `(("\\(#\\){"
-                     (0 (progn (compose-region (match-beginning 1)
-                                               (match-end 1) "∈")
-                               nil))))))
-#+end_src
 
 ** Erlang
 Setup Erlang mode.
@@ -841,6 +764,14 @@ Setup Erlang mode.
 (autoload 'tuareg-mode "tuareg" "Major mode for editing OCaml code" t)
 (autoload 'tuareg-run-ocaml "tuareg" "Run an inferior OCaml process." t)
 (autoload 'ocamldebug "ocamldebug" "Run the OCaml debugger" t)
+(autoload 'tuareg-imenu-set-imenu "tuareg-imenu"
+  "Configuration of imenu for tuareg" t)
+(add-hook 'tuareg-mode-hook 'tuareg-imenu-set-imenu)
+(setq auto-mode-alist
+    (append '(("\\.ml[ily]?$" . tuareg-mode)
+       ("\\.topml$" . tuareg-mode))
+       auto-mode-alist))
+
 (setq tuareg-font-lock-symbols t)
 
 ;; Indent `=' like a standard keyword.
@@ -855,6 +786,10 @@ Setup Erlang mode.
 	  (lambda () (auto-fill-mode 1)))
 #+end_src
 
+
+
+
+
 *** Coq
 #+begin_src emacs-lisp
 (setq auto-mode-alist (remove (rassoc 'verilog-mode auto-mode-alist) auto-mode-alist))
@@ -867,7 +802,7 @@ Setup Erlang mode.
 
 ** Python
 #+begin_src emacs-lisp
-(require 'python-mode)
-(require 'python-pep8)
-(require 'python-pylint)
+;(require 'python-mode)
+;(require 'python-pep8)
+;(require 'python-pylint)
 #+end_src
