@@ -1,4 +1,6 @@
 
+(defconst emacs-start-time (current-time))
+
 (setq user-full-name "Ulf Ejlertsson")
 (setq user-mail-address "ulf.ejlertsson@gmail.com")
 
@@ -107,7 +109,8 @@
 
 (use-package smex
   :init (smex-initialize)
-  :bind ("M-x" . smex))
+  :bind (("M-x" . smex)
+         ("M-X" . smex-major-mode-commands)))
 
 (use-package multiple-cursors
   :bind (("C->" . mc/mark-next-like-this)
@@ -444,44 +447,50 @@ from the namespace declaration iff the open brace sits on a line by itself."
 
 (add-hook 'erlang-mode-hook 'ue-erlang-mode-hook)
 
-(require 'haskell-mode)
-(add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
-(add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
-(add-hook 'haskell-mode-hook 'font-lock-mode)
-
-(add-hook 'haskell-mode-hook 'turn-on-haskell-font-lock)
-(setq haskell-font-lock-symbols t)
-
- (autoload 'ghc-init "ghc" nil t)
- (add-hook 'haskell-mode-hook
-           (lambda ()
-               (ghc-init)
-               (flymake-mode)
-               (require 'auto-complete-config)
-               (auto-complete-mode t)
-               (add-to-list 'ac-sources 'ac-source-ghc-mod)))
-;; haskell-mode hooks
-(add-hook 'haskell-mode-hook 'capitalized-words-mode)
-(add-hook 'haskell-mode-hook 'turn-on-haskell-decl-scan)
 (defun pretty-lambdas-haskell ()
   (font-lock-add-keywords
-   nil `((,(concat "\\(" (regexp-quote "\\") "\\)")
-          (0 (progn (compose-region (match-beginning 1) (match-end 1)
-                                    ,(make-char 'greek-iso8859-7 107))
-                    nil))))))
+     nil `((,(concat "\\(" (regexp-quote "\\") "\\)")
+            (0 (progn (compose-region (match-beginning 1) (match-end 1)
+                                      ,(make-char 'greek-iso8859-7 107))
+                      nil))))))
 
-(add-hook 'haskell-mode-hook (lambda () (ghc-init) (flymake-mode)))
+(use-package haskell-mode
+      :commands haskell-mode
+      :init 
+  (add-to-list 'auto-mode-alist'("//.l?hs$" . haskell-mode))
+    :config 
+  (progn 
+    (use-package inf-haskell)
+    (use-package hs-lint)
+    (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
+    (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
+    (add-hook 'haskell-mode-hook 'font-lock-mode)
+    (add-hook 'haskell-mode-hook 'turn-on-haskell-font-lock)
+    (setq haskell-font-lock-symbols t)
+    (add-hook 'haskell-mode-hook
+             (lambda ()
+                 (ghc-init)
+                 (flymake-mode)
+                 (require 'auto-complete-config)
+                 (auto-complete-mode t)
+                 (add-to-list 'ac-sources 'ac-source-ghc-mod)))
+    ;; haskell-mode hooks
+    (add-hook 'haskell-mode-hook 'capitalized-words-mode)
+    (add-hook 'haskell-mode-hook 'turn-on-haskell-decl-scan)
+    (add-hook 'haskell-mode-hook (lambda () (ghc-init) (flymake-mode)))
+    (add-hook 'haskell-mode-hook 'pretty-lambdas-)))
+  
+  (autoload 'ghc-init "ghc" nil t)
+  
+  (after 'haskell-font-lock
+   '(setq haskell-font-lock-symbols-alist
+          (delq nil
+                (mapcar (lambda (rewrite)
+                          (if (member (car rewrite) '("->" "<-"))
+                              nil rewrite))
+                        haskell-font-lock-symbols-alist))))
 
-
-(add-hook 'haskell-mode-hook 'pretty-lambdas-haskell)
-
-(eval-after-load 'haskell-font-lock
- '(setq haskell-font-lock-symbols-alist
-        (delq nil
-              (mapcar (lambda (rewrite)
-                        (if (member (car rewrite) '("->" "<-"))
-                            nil rewrite))
-                      haskell-font-lock-symbols-alist))))
+(use-package idris-mode)
 
 '(agda2-include-dirs (quote ("/Users/ulf/Dev/haskell/lib-0.6/src")))
 (load-file (let ((coding-system-for-read 'utf-8))
