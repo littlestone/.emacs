@@ -10,6 +10,10 @@ brighter; it simply makes everything else vanish.
 -- Neal Stephenson, "In the Beginning was the Command Line"
 #+end_quote
 
+* Set emacs start time
+#+begin_src emacs-lisp
+(defconst emacs-start-time (current-time))
+#+end_src
 
 * Set personal info explicit.
 #+begin_src emacs-lisp
@@ -203,9 +207,10 @@ Make buffer names unique.
 
 * Smex
 #+begin_src emacs-lisp
-(use-package smex
-  :init (smex-initialize)
-  :bind ("M-x" . smex))
+  (use-package smex
+    :init (smex-initialize)
+    :bind (("M-x" . smex)
+           ("M-X" . smex-major-mode-commands)))
 #+end_src
 
 * Multiple cursors
@@ -367,6 +372,13 @@ from my buffer search.
   (progn
     (require 'smartparens-config)
     (setq smartparens-strict-mode t)))
+#+end_src
+
+* Rainbow delimiters
+#+begin_src emacs-lisp
+(use-package rainbow-delimiters)
+(after 'rainbow-delimiters-autoloads
+  (add-hook 'prog-mode-hook 'rainbow-delimiters-mode-enable))
 #+end_src
 
 * TODOS
@@ -605,9 +617,9 @@ Every Lisp needs a pretty lambda character.
 
 Enable rainbow delimiters.
 #+begin_src emacs-lisp
-(require 'rainbow-delimiters)
-(after 'rainbow-delimiters-autoloads
-  (add-hook 'prog-mode-hook 'rainbow-delimiters-mode-enable))
+;(require 'rainbow-delimiters)
+;(after 'rainbow-delimiters-autoloads
+;  (add-hook 'prog-mode-hook 'rainbow-delimiters-mode-enable))
 ;(global-rainbow-delimiters-mode)
 #+end_src
 
@@ -712,48 +724,56 @@ Setup Erlang mode.
 
 ** Haskell
 #+begin_src emacs-lisp
-(require 'haskell-mode)
-(add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
-(add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
-(add-hook 'haskell-mode-hook 'font-lock-mode)
-
-(add-hook 'haskell-mode-hook 'turn-on-haskell-font-lock)
-(setq haskell-font-lock-symbols t)
-
- (autoload 'ghc-init "ghc" nil t)
- (add-hook 'haskell-mode-hook
-           (lambda ()
-               (ghc-init)
-               (flymake-mode)
-               (require 'auto-complete-config)
-               (auto-complete-mode t)
-               (add-to-list 'ac-sources 'ac-source-ghc-mod)))
-;; haskell-mode hooks
-(add-hook 'haskell-mode-hook 'capitalized-words-mode)
-(add-hook 'haskell-mode-hook 'turn-on-haskell-decl-scan)
 (defun pretty-lambdas-haskell ()
   (font-lock-add-keywords
-   nil `((,(concat "\\(" (regexp-quote "\\") "\\)")
-          (0 (progn (compose-region (match-beginning 1) (match-end 1)
-                                    ,(make-char 'greek-iso8859-7 107))
-                    nil))))))
+     nil `((,(concat "\\(" (regexp-quote "\\") "\\)")
+            (0 (progn (compose-region (match-beginning 1) (match-end 1)
+                                      ,(make-char 'greek-iso8859-7 107))
+                      nil))))))
 
-(add-hook 'haskell-mode-hook (lambda () (ghc-init) (flymake-mode)))
-
-
-(add-hook 'haskell-mode-hook 'pretty-lambdas-haskell)
-
-(eval-after-load 'haskell-font-lock
- '(setq haskell-font-lock-symbols-alist
-        (delq nil
-              (mapcar (lambda (rewrite)
-                        (if (member (car rewrite) '("->" "<-"))
-                            nil rewrite))
-                      haskell-font-lock-symbols-alist))))
+(use-package haskell-mode
+      :commands haskell-mode
+      :init 
+  (add-to-list 'auto-mode-alist'("//.l?hs$" . haskell-mode))
+    :config 
+  (progn 
+    (use-package inf-haskell)
+    (use-package hs-lint)
+    (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
+    (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
+    (add-hook 'haskell-mode-hook 'font-lock-mode)
+    (add-hook 'haskell-mode-hook 'turn-on-haskell-font-lock)
+    (setq haskell-font-lock-symbols t)
+    (add-hook 'haskell-mode-hook
+             (lambda ()
+                 (ghc-init)
+                 (flymake-mode)
+                 (require 'auto-complete-config)
+                 (auto-complete-mode t)
+                 (add-to-list 'ac-sources 'ac-source-ghc-mod)))
+    ;; haskell-mode hooks
+    (add-hook 'haskell-mode-hook 'capitalized-words-mode)
+    (add-hook 'haskell-mode-hook 'turn-on-haskell-decl-scan)
+    (add-hook 'haskell-mode-hook (lambda () (ghc-init) (flymake-mode)))
+    (add-hook 'haskell-mode-hook 'pretty-lambdas-)))
+  
+  (autoload 'ghc-init "ghc" nil t)
+  
+  (after 'haskell-font-lock
+   '(setq haskell-font-lock-symbols-alist
+          (delq nil
+                (mapcar (lambda (rewrite)
+                          (if (member (car rewrite) '("->" "<-"))
+                              nil rewrite))
+                        haskell-font-lock-symbols-alist))))
 #+end_src
+
+*** Idris
+(use-package idris-mode)
 
 *** Agda
 #+begin_src emacs-lisp
+'(agda2-include-dirs (quote ("/Users/ulf/Dev/haskell/lib-0.6/src")))
 (load-file (let ((coding-system-for-read 'utf-8))
                 (shell-command-to-string "agda-mode locate")))
 #+end_src
@@ -785,9 +805,6 @@ Setup Erlang mode.
 	  ;; Turn on auto-fill minor mode.
 	  (lambda () (auto-fill-mode 1)))
 #+end_src
-
-
-
 
 
 *** Coq
