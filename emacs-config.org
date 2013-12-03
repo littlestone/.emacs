@@ -30,7 +30,6 @@ Winner mode is great when you depend a lot on working with Emacs windows.
   :init
   (progn
     (winner-mode 1)
-
     (bind-key "M-N" 'winner-redo)
     (bind-key "M-P" 'winner-undo)))
 #+end_src
@@ -381,7 +380,7 @@ from my buffer search.
   (add-hook 'prog-mode-hook 'rainbow-delimiters-mode-enable))
 #+end_src
 
-* TODOS
+* Todos
 
 
 * Org mode
@@ -769,7 +768,9 @@ Setup Erlang mode.
 #+end_src
 
 *** Idris
+#+begin_src emacs-lisp
 (use-package idris-mode)
+#+end_src
 
 *** Agda
 #+begin_src emacs-lisp
