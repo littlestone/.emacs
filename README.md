@@ -1,4 +1,1 @@
-.emacs
-======
-
-Emacs Configuration
+* Personal Emacs Configuration

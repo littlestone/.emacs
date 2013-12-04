@@ -21,18 +21,18 @@ brighter; it simply makes everything else vanish.
 (setq user-mail-address "ulf.ejlertsson@gmail.com")
 #+end_src
 
-* Winner Mode
-Winner mode is great when you depend a lot on working with Emacs windows.
-#begin_src emacs-lisp
-(use-package winner
-  :diminish winner-mode
-  :if (not noninteractive)
-  :init
-  (progn
-    (winner-mode 1)
-    (bind-key "M-N" 'winner-redo)
-    (bind-key "M-P" 'winner-undo)))
+* Useful packages
+#+begin_src emacs-lisp
+(require 'use-package)
+(eval-when-compile
+  (setq use-package-verbose (null byte-compile-current-file)))
+
+(require 'git)
+(require 'cl)
+(require 'em-smart)
+(require 'ansi-color) 
 #+end_src
+
 
 * Auto revert
 Make Emacs reload changed files if you haven't also changed them in Emacs.
@@ -58,21 +58,6 @@ from: http://milkbox.net/note/single-file-master-emacs-configuration/
      '(progn ,@body)))
 #+end_src
 
-* Required packages
-#+begin_src emacs-lisp
-(require 'use-package)
-(eval-when-compile
-  (setq use-package-verbose (null byte-compile-current-file)))
-
-(require 'git)
-(require 'cl)
-(require 'eshell)
-(require 'em-smart)
-(require 'yasnippet)
-(require 'flx-ido)
-(require 'ansi-color) 
-(require 'helm-config)
-#+end_src
 
 * Spash screen
 Turn of splash screen and the message.
@@ -113,22 +98,6 @@ Add the ~/bin to the Emacs shell path and fix the PATH variable on OS X
 (if window-system (set-exec-path-from-shell-PATH))
 #+end_src
 
-* Zenburn theme
-#+begin_src emacs-lisp
-(use-package zenburn-theme)
-#+end_src
-
-* Yasnippet
-#+begin_src emacs-lisp
-(use-package yasnippet
-  :init
-  (progn
-    (let ((snippets-dir (f-expand "snippets" user-emacs-directory)))
-      (yas/load-directory snippets-dir)
-      (setq yas/snippet-dirs snippets-dir))
-    (yas-global-mode 1)
-    (setq-default yas/prompt-functions '(yas/ido-prompt))))
-#+end_src
 
 * ANSI color
 Enable ANSI colors for the shell by default.
@@ -136,15 +105,6 @@ Enable ANSI colors for the shell by default.
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 #+end_src
 
-* Reload emacs
-Reload =.emacs= file (useful for editing .emacs itself :)
-#+begin_src emacs-lisp
-(defun reload-dotemacs ()
-  "Reload .emacs"
-  (interactive)
-  (load-file "~/.emacs.d/init.el"))
-(global-set-key "\M-e" 'reload-dotemacs)
-#+end_src
 
 * Display settings
 Set the default font, and set transparency.
@@ -202,14 +162,55 @@ Make buffer names unique.
 #+end_src
 
 
+* Reload emacs
+Reload =.emacs= file (useful for editing .emacs itself :)
+#+begin_src emacs-lisp
+(defun reload-dotemacs ()
+  "Reload .emacs"
+  (interactive)
+  (load-file "~/.emacs.d/init.el"))
+(global-set-key "\M-e" 'reload-dotemacs)
+#+end_src
 
+* Zenburn theme
+#+begin_src emacs-lisp
+(use-package zenburn-theme)
+#+end_src
+
+
+
+* Winner Mode
+Winner mode is great when you depend a lot on working with Emacs windows.
+#+begin_src emacs-lisp
+(use-package winner
+  :diminish winner-mode
+  :if (not noninteractive)
+  :init
+  (progn
+    (winner-mode 1)
+    (bind-key "M-N" 'winner-redo)
+    (bind-key "M-P" 'winner-undo)))
+#+end_src
+
+* Yasnippet
+#+begin_src emacs-lisp
+(require 'yasnippet)
+(use-package yasnippet
+  :init
+  (progn
+    (let ((snippets-dir (f-expand "snippets" user-emacs-directory)))
+      (yas/load-directory snippets-dir)
+      (setq yas/snippet-dirs snippets-dir))
+    (yas-global-mode 1)
+    (setq-default yas/prompt-functions '(yas/ido-prompt))))
+#+end_src
 
 * Smex
 #+begin_src emacs-lisp
-  (use-package smex
-    :init (smex-initialize)
-    :bind (("M-x" . smex)
-           ("M-X" . smex-major-mode-commands)))
+(use-package smex
+  :init (smex-initialize)
+  :bind (("M-x" . smex)
+         ("M-X" . smex-major-mode-commands)))
 #+end_src
 
 * Multiple cursors
@@ -253,8 +254,7 @@ http://magit.github.io/magit/
     (setq magit-set-upstream-on-push t)
     (setq magit-completing-read-function 'magit-ido-completing-read)
     (setq magit-stage-all-confirm nil)
-    (setq magit-unstage-all-confirm nil)
-    (add-hook 'magit-mode-hook 'rinari-launch))
+    (setq magit-unstage-all-confirm nil))
   :bind ("C-x g" . magit-status))
 #+end_src
 
@@ -287,6 +287,7 @@ Make buffer names unique.
 * Eshell
 Enable /Plan 9/'s terminal, the eshell smart display with =Meta-e=.
 #+begin_src emacs-lisp
+(require 'eshell)
 (use-package eshell
   :bind ("M-e" . eshell)
   :init
@@ -321,6 +322,7 @@ Ido stands for Interactively Do Things.
 =ido-use-virtual-buffers= lets me switch to (and re-open) closed buffers
 from my buffer search.
 #+begin_src emacs-lisp
+(require 'flx-ido)
 (use-package ido
   :init (ido-mode 1)
   :config
@@ -342,6 +344,7 @@ from my buffer search.
 
 * Helm
 #+begin_src emacs-lisp
+(require 'helm-config)
 (use-package helm-config
   :init
   (progn
@@ -438,13 +441,16 @@ Set the name of the file where new notes will be stored.
 #+end_src
 
 * Deft
-
 #+begin_src emacs-lisp
+(use-package deft
+  :config
+   (progn
      (setq deft-directory "~/Dropbox/org/deft")
      (setq deft-use-filename-as-title t)
      (setq deft-extension "org")
-     (setq deft-text-mode 'org-mode)
-   #+end_src
+     (setq deft-text-mode 'org-mode)))
+#+end_src
+
 
 * LaTeX
 Invoke the AUCTeX package.
@@ -456,33 +462,32 @@ Invoke the AUCTeX package.
 * Recentf
 #+begin_src emacs-lisp
 (require 'recentf)
+(use-package recentf
+  :init (progn (setq recentf-max-saved-items 50)
+               (recentf-mode 1)))
+
 
 ;; get rid of `find-file-read-only' and replace it with something
 ;; more useful.
 (global-set-key (kbd "C-x C-r") 'ido-recentf-open)
-
-;; enable recent files mode.
-(recentf-mode t)
-
-; 50 files ought to be enough.
-(setq recentf-max-saved-items 50)
 
 (defun ido-recentf-open ()
   "Use `ido-completing-read' to \\[find-file] a recent file"
   (interactive)
   (if (find-file (ido-completing-read "Find recent file: " recentf-list))
       (message "Opening file...")
-    (message "Aborting")))
-
+      (message "Aborting")))
 #+end_src
 
 * Undo tree
 #+begin_src emacs-lisp
 (require 'undo-tree)
-(after 'undo-tree-autoloads
-  (global-undo-tree-mode t)
-  (setq undo-tree-visualizer-relative-timestamps t)
-  (setq undo-tree-visualizer-timestamps t))
+(use-package undo-tree
+  :ensure t
+  :config (progn
+    (global-undo-tree-mode)
+    (setq undo-tree-visualizer-relative-timestamps t)
+    (setq undo-tree-visualizer-timestamps t)))
 #+end_src
 
 
@@ -820,6 +825,13 @@ Setup Erlang mode.
 
 ** Python
 #+begin_src emacs-lisp
+
+;; Use `python', the newer package off Marmalade.
+(use-package python
+  :ensure   t
+  :commands python-mode
+  :mode     ("\\.py$" . python-mode))
+
 ;(require 'python-mode)
 ;(require 'python-pep8)
 ;(require 'python-pylint)
