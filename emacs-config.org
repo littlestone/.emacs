@@ -600,7 +600,6 @@ Syntax highlighting mode for TableGen description files (tablegen-mode.el).
 (autoload 'objc-mode "cc-mode" "Objective-C Editing Mode" t)
 #+end_src
 
-
 ** Lisp
 Every Lisp needs a pretty lambda character.
 #+begin_src emacs-lis
@@ -619,20 +618,13 @@ Every Lisp needs a pretty lambda character.
 (add-hook 'after-save-hook 'check-parens)
 #+end_src
 
-Enable rainbow delimiters.
-#+begin_src emacs-lisp
-;(require 'rainbow-delimiters)
-;(after 'rainbow-delimiters-autoloads
-;  (add-hook 'prog-mode-hook 'rainbow-delimiters-mode-enable))
-;(global-rainbow-delimiters-mode)
-#+end_src
 
 Enable 'hightlight-parentheses-mode'.
 #+begin_src emacs-lisp
 (require 'highlight-parentheses)
 #+end_src
 
-Enable =paredit=.
+** TODO Enable =paredit=.
 #+begin_src emacs-lisp
 (require 'paredit)
 #+end_src
@@ -643,14 +635,14 @@ Shen-mode.
 ;(require 'inf-shen) ; <- for interaction with an external shen process
 #+end_src
 
-*** Common Lisp
+*** TODO Common Lisp
 Enable =slime= for Lisp.
 #+begin_src emacs-lisp
 ;(setq inferior-lisp-program "/Applications/Clozure\ CL.app")
 ;     (require 'slime-autoloads)
 #+end_src
 
-*** Racket/Scheme
+*** TODO Racket/Scheme
 Enable =geiser= and =quack= for scheme/racket.
 #+begin_src emacs-lisp
 (setq geiser-active-implementations '(racket))
@@ -777,14 +769,14 @@ Setup Erlang mode.
 (use-package idris-mode)
 #+end_src
 
-*** Agda
+*** TODO Agda
 #+begin_src emacs-lisp
 '(agda2-include-dirs (quote ("/Users/ulf/Dev/haskell/lib-0.6/src")))
 (load-file (let ((coding-system-for-read 'utf-8))
                 (shell-command-to-string "agda-mode locate")))
 #+end_src
 
-** Ocaml
+** TODO Ocaml
 #+begin_src emacs-lisp
 (add-to-list 'auto-mode-alist '("\\.ml[iylp]?" . tuareg-mode))
 (autoload 'tuareg-mode "tuareg" "Major mode for editing OCaml code" t)
@@ -813,7 +805,7 @@ Setup Erlang mode.
 #+end_src
 
 
-*** Coq
+*** TODO Coq
 #+begin_src emacs-lisp
 (setq auto-mode-alist (remove (rassoc 'verilog-mode auto-mode-alist) auto-mode-alist))
 ;;(load-file (concat site-packages-dir "/ProofGeneral/generic/proof-site.el"))
@@ -825,13 +817,12 @@ Setup Erlang mode.
 
 ** Python
 #+begin_src emacs-lisp
-
-;; Use `python', the newer package off Marmalade.
 (use-package python
   :ensure   t
   :commands python-mode
   :mode     ("\\.py$" . python-mode))
 
+; Need to fix these
 ;(require 'python-mode)
 ;(require 'python-pep8)
 ;(require 'python-pylint)
