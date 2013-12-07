@@ -10,6 +10,31 @@ brighter; it simply makes everything else vanish.
 -- Neal Stephenson, "In the Beginning was the Command Line"
 #+end_quote
 
+* Core
+- ido
+- ibuffer
+- powerline
+- recentf
+- smex
+- 
+
+* Notes
+- org
+- deft
+- latex
+
+* Power
+- ace-jump
+- git-gutter
+- undo-tree
+- yasnippets
+- multiple cursors
+
+* Foundation
+- ido
+- 
+
+
 * Set emacs start time
 #+begin_src emacs-lisp
 (defconst emacs-start-time (current-time))
@@ -29,7 +54,6 @@ brighter; it simply makes everything else vanish.
 
 (require 'git)
 (require 'cl)
-(require 'em-smart)
 (require 'ansi-color) 
 #+end_src
 
@@ -179,6 +203,19 @@ Reload =.emacs= file (useful for editing .emacs itself :)
 
 
 
+* Powerline
+#+begin_src emacs-lisp
+(use-package powerline
+  :ensure t
+  :config
+  (progn
+    (powerline-default-theme)
+    (custom-set-variables
+      '(powerline-default-separator 'arrow))
+    (setq powerline-arrow-shape 'arrow14)
+))
+#+end_src
+
 * Winner Mode
 Winner mode is great when you depend a lot on working with Emacs windows.
 #+begin_src emacs-lisp
@@ -285,9 +322,11 @@ Make buffer names unique.
 #+end_src
 
 * Eshell
+Plan 9′s terminal, called the Eshell smart display. 
 Enable /Plan 9/'s terminal, the eshell smart display with =Meta-e=.
 #+begin_src emacs-lisp
 (require 'eshell)
+(require 'em-smart)
 (use-package eshell
   :bind ("M-e" . eshell)
   :init

@@ -21,6 +21,7 @@
 (depends-on "pallet")
 (depends-on "paredit")
 (depends-on "popup")
+(depends-on "powerline")
 (depends-on "rainbow-delimiters")
 (depends-on "smartparens")
 (depends-on "smex")
