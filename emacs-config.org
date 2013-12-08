@@ -49,7 +49,6 @@ Make Emacs reload changed files if you haven't also changed them in Emacs.
 * Useful macro
 from: http://milkbox.net/note/single-file-master-emacs-configuration/
 #+begin_src emacs-lisp
-;;;; macros
 (defmacro after (mode &rest body)
   "`eval-after-load' MODE evaluate BODY."
   (declare (indent defun))
@@ -446,28 +445,35 @@ from my buffer search.
 ** Org mode
 #+begin_src emacs-lisp
 (require 'ob-tangle)
-(add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
-(define-key global-map "\C-cl" 'org-store-link)
-(define-key global-map "\C-ca" 'org-agenda)
-(setq org-export-with-LaTeX-fragments t)
-(setq org-log-done t)
-#+end_src
+(use-package org
+  :mode ("\\.org$" . org-mode)
+  :config
+  (progn
+    ;; auto-wrap
+    (add-hook 'org-mode-hook 'bw-turn-on-auto-fill)
 
-Enable /babel/ for some languages.
-#+begin_src emacs-lisp
-(org-babel-do-load-languages
- 'org-babel-load-languages
-  '( (haskell . t)
-     ;;(clojure. t)
-     (sh . t)
-     (python . t)
-     (emacs-lisp . t)
-     (C . t)
-     (ocaml . t)
-   ))
+    ;; edit inline code blocks natively
+    (setq
+     org-src-fontify-natively t
+     org-src-tab-acts-natively t
+     org-completion-use-ido t
+     org-export-with-LaTeX-fragments t
+     org-log-done t)
 
-(setq org-src-fontify-natively t)
-(setq org-src-tab-acts-natively t)
+    ;; Show other programming languages semi-natively when embedded
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     ;; load emacs-lisp natively
+     '((emacs-lisp . t)
+       (haskell . t)
+       (sh . t)
+       (python . t)
+       (C . t)
+       (ocaml . t)
+       ))
+
+    ;; default directory
+    (setq org-directory (expand-file-name "~/org/"))))
 #+end_src
 
 ** Enable =LaTeX= in Org mode
