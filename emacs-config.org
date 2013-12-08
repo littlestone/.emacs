@@ -189,6 +189,11 @@ Reload =.emacs= file (useful for editing .emacs itself :)
     (custom-set-variables
       '(powerline-default-separator 'arrow))
     (setq powerline-arrow-shape 'arrow14)
+    ;; modeline items    
+    (setq display-time-day-and-date t)
+    (setq display-time-24hr-format t)
+    (display-time-mode 1)
+
 ))
 #+end_src
 
@@ -638,6 +643,28 @@ Enable 'hightlight-parentheses-mode'.
 ** TODO Enable =paredit=.
 #+begin_src emacs-lisp
 (require 'paredit)
+(use-package paredit
+  :if (not noninteractive)
+  :diminish (paredit-mode . " π")
+  :ensure paredit
+  :config (progn
+            (dolist (hook '(emacs-lisp-mode-hook lisp-mode-hook
+                            eval-expression-minibuffer-setup-hook
+                            ielm-mode-hook lisp-interaction-mode-hook scheme-mode-hook))
+              (add-hook hook 'enable-paredit-mode))))
+#+end_src
+
+#+begin_src emacs-lisp
+(defun ielm-auto-complete ()
+  "Enables `auto-complete' support in \\[ielm]."
+  (setq ac-sources '(ac-source-functions
+                     ac-source-variables
+                     ac-source-features
+                     ac-source-symbols
+                     ac-source-words-in-same-mode-buffers))
+  (add-to-list 'ac-modes 'inferior-emacs-lisp-mode)
+  (auto-complete-mode 1))
+(add-hook 'ielm-mode-hook 'ielm-auto-complete)
 #+end_src
 
 Shen-mode.
