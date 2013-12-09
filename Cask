@@ -7,6 +7,8 @@
 (depends-on "dash")
 (depends-on "deft")
 (depends-on "f")
+(depends-on "fill-column-idicator")
+(depends-on "fill-column-indicator")
 (depends-on "flx")
 (depends-on "flx-ido")
 (depends-on "git")
@@ -31,3 +33,4 @@
 (depends-on "use-package")
 (depends-on "yasnippet")
 (depends-on "zenburn-theme")
+(depends-on "fill-column-indicator")

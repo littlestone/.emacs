@@ -32,7 +32,22 @@ brighter; it simply makes everything else vanish.
 (require 'ansi-color) 
 #+end_src
 
+* El doc
+#+begin_src emacs-lisp
+(use-package eldoc
+  :defer t
+  :diminish eldoc-mode)
+#+end_src
 
+* Calc
+#+begin_src emacs-lisp
+(use-package calc
+  :defer t
+  :bind (("<kp-multiply>" . calc-dispatch)
+         ("C-<kp-multiply>" . quick-calc))
+  ;; the trail is distracting
+  :config (setq calc-display-trail nil))
+#+end_src
 * Auto revert
 Make Emacs reload changed files if you haven't also changed them in Emacs.
 #+begin_src emacs-lisp
@@ -86,6 +101,17 @@ Disable tool bar, the rest is fine on OSX
 (show-paren-mode t)
 (global-hl-line-mode +1)
 #+end_src
+
+* Fill column
+#+begin_src emacs-lisp
+(use-package fill-column-indicator
+  :init
+  (progn
+    (setq-default fci-rule-column 80)
+    (setq fci-rule-color "darkgrey")
+    (fci-mode)))
+#+end_src
+
 * Setting up the Emacs server
 #+begin_src emacs-lisp
 (server-start)
