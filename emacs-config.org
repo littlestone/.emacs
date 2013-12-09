@@ -182,7 +182,7 @@ Reload =.emacs= file (useful for editing .emacs itself :)
 #+begin_src emacs-lisp
 (use-package powerline
   :ensure t
-  :config
+  :config 
   (progn
     (powerline-default-theme)
     (custom-set-variables
@@ -419,6 +419,13 @@ from my buffer search.
   (if (find-file (ido-completing-read "Find recent file: " recentf-list))
       (message "Opening file...")
       (message "Aborting")))
+#+end_src
+
+** Ibuffer
+#+begin_src emacs-lisp
+(use-package ibuffer
+  :bind ("C-x C-b" . ibuffer)
+  :config (setq ibuffer-default-sorting-mode 'major-mode))
 #+end_src
 
 ** Undo tree

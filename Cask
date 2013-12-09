@@ -25,6 +25,7 @@
 (depends-on "rainbow-delimiters")
 (depends-on "smartparens")
 (depends-on "smex")
+(depends-on "solarized-theme")
 (depends-on "tuareg")
 (depends-on "undo-tree")
 (depends-on "use-package")
