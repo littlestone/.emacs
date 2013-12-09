@@ -559,7 +559,23 @@ Set the name of the file where new notes will be stored.
 ** LaTeX
 Invoke the AUCTeX package.
 #+begin_src emacs-lisp
-;;(require 'tex-site)
+(use-package tex
+  :config
+  (progn
+    (use-package tex-mik)
+    (add-hook 'TeX-mode-hook 'TeX-PDF-mode) ;Generate PDFs (this is file local)
+    (setq TeX-parse-self t) ;Parse when loading a file
+    (setq TeX-auto-save t) ;Parse when saving a file
+    (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+    (setq reftex-plug-into-AUCTeX t)
+    (add-hook 'TeX-mode-hook 'TeX-fold-mode)
+    (setq LaTeX-csquotes-close-quote "}"
+          LaTeX-csquotes-open-quote "\\enquote{")
+    (setq TeX-engine-alist '((pdflatex_sh "pdftlatex shell escape" 
+                              "pdflatex --file-line-error --shell-escape" 
+                              "pdflatex --file-line-error --shell-escape" 
+                              "pdflatex")))
+    ))
 #+end_src
 
 
