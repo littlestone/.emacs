@@ -337,7 +337,7 @@ Make buffer names unique.
 #+end_src
 
 ** Eshell
-Enable eshell and /Plan 9/' like terminal, the eshell smart display with =Meta-e=.
+Enable eshell and the smart display with =Meta-e=.
 #+begin_src emacs-lisp
 (require 'eshell)
 (require 'em-smart)
