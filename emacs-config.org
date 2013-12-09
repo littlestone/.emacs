@@ -121,7 +121,7 @@ Disable tool bar, the rest is fine on OSX
 * Paths
 Add the ~/bin to the Emacs shell path and fix the PATH variable on OS X
 #+begin_src emacs-lisp
-(add-to-list 'exec-path "/Users/ulf/bin")
+(add-to-list 'exec-path "~/bin")
 
 (defun set-exec-path-from-shell-PATH ()
   (let ((path-from-shell (shell-command-to-string "$SHELL -i -c 'echo $PATH'")))
