@@ -69,7 +69,7 @@ Turn of splash screen and the message.
 (setq visible-bell t)
 (fset 'yes-or-no-p 'y-or-n-p)
 #+end_src
-
+  
 * Scroll bar, tool bar and menu bar
 Disable tool bar, the rest is fine on OSX
 #+begin_src emacs-lisp
@@ -77,6 +77,15 @@ Disable tool bar, the rest is fine on OSX
   (tool-bar-mode -1))
 #+end_src
 
+* Useful defaults
+#+begin_src emacs-lisp
+(setq-default indent-tabs-mode nil)
+(transient-mark-mode t)
+(delete-selection-mode t)
+(column-number-mode t)
+(show-paren-mode t)
+(global-hl-line-mode +1)
+#+end_src
 * Setting up the Emacs server
 #+begin_src emacs-lisp
 (server-start)
