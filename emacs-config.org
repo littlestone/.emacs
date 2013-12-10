@@ -79,7 +79,7 @@ Turn of splash screen and the message.
       initial-scratch-message nil)
 #+end_src
 
-* No beeping and 'y' for yes.
+* No beeping and 'y' for yes
 #+begin_src emacs-lisp
 (setq visible-bell t)
 (fset 'yes-or-no-p 'y-or-n-p)
@@ -100,6 +100,13 @@ Disable tool bar, the rest is fine on OSX
 (column-number-mode t)
 (show-paren-mode t)
 (global-hl-line-mode +1)
+(defun bw-turn-on-auto-fill ()
+  (auto-fill-mode 1))
+
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
 #+end_src
 
 * Fill column
@@ -148,7 +155,7 @@ Set the default font, and set transparency.
 (add-to-list 'default-frame-alist '(alpha 96 84))
 #+end_src
 
-** Toggle transparency.
+** Toggle transparency
 #+begin_src emacs-lisp
 (defun toggle-transparency ()
   (interactive)
@@ -159,7 +166,7 @@ Set the default font, and set transparency.
 (global-set-key (kbd "C-c t") 'toggle-transparency)
 #+end_src
 
-** Make Emacs to fully redraw the display before it processes queued input events.
+** Make Emacs to fully redraw the display before it processes queued input events
 #+begin_src emacs-lisp
 (setq redisplay-dont-pause t)
 #+end_src
@@ -682,7 +689,7 @@ Syntax highlighting mode for TableGen description files (tablegen-mode.el).
 
 ** Lisp
 Every Lisp needs a pretty lambda character.
-#+begin_src emacs-lis
+#+begin_src emacs-lisp
 (defun ue-pretty-lambdas ()
   "Display the word "lambda" by "λ"."
   (font-lock-add-keywords
@@ -693,9 +700,97 @@ Every Lisp needs a pretty lambda character.
 	 (compose-region (match-beginning 1) (match-end 1) "λ")
 	 'font-lock-keyword-face))))))
 
-(add-hook 'emacs-lisp-mode-hook 'ue-pretty-lambdas)
-(add-hook 'lisp-mode-hook 'ue-pretty-lambdas)
-(add-hook 'after-save-hook 'check-parens)
+(use-package lisp-mode
+  :init
+  (progn
+    (defvar slime-mode nil)
+    (defvar lisp-mode-initialized nil)
+
+    (defun initialize-lisp-mode ()
+      (unless lisp-mode-initialized
+        (setq lisp-mode-initialized t)
+
+        (use-package redshank
+          :diminish redshank-mode)
+
+        (use-package elisp-slime-nav
+          :diminish elisp-slime-nav-mode)
+
+        (use-package edebug)
+
+        (use-package eldoc
+          :diminish eldoc-mode
+          :defer t
+          :init
+          (use-package eldoc-extension
+            :disabled t
+            :defer t
+            :init
+            (add-hook 'emacs-lisp-mode-hook
+                      #'(lambda () (require 'eldoc-extension)) t))
+
+          :config
+          (eldoc-add-command 'paredit-backward-delete
+                             'paredit-close-round))
+
+        (use-package cldoc
+          :diminish cldoc-mode)
+
+        (use-package ert
+          :commands ert-run-tests-interactively
+          :bind ("C-c e t" . ert-run-tests-interactively))
+
+        (use-package elint
+          :commands 'elint-initialize
+          :init
+          (defun elint-current-buffer ()
+            (interactive)
+            (elint-initialize)
+            (elint-current-buffer))
+
+          :config
+          (progn
+            (add-to-list 'elint-standard-variables 'current-prefix-arg)
+            (add-to-list 'elint-standard-variables 'command-line-args-left)
+            (add-to-list 'elint-standard-variables 'buffer-file-coding-system)
+            (add-to-list 'elint-standard-variables 'emacs-major-version)
+            (add-to-list 'elint-standard-variables 'window-system)))
+
+        (use-package highlight-cl
+          :init
+          (mapc (function
+                 (lambda (mode-hook)
+                   (add-hook mode-hook
+                             'highlight-cl-add-font-lock-keywords)))
+                lisp-mode-hooks))
+
+
+       (defun my-lisp-mode-hook ()
+         (initialize-lisp-mode)
+
+         (auto-fill-mode 1)
+         (paredit-mode 1)
+         (redshank-mode 1)
+         (elisp-slime-nav-mode 1)
+
+         (local-set-key (kbd "<return>") 'paredit-newline)
+         (add-hook 'emacs-lisp-mode-hook 'ue-pretty-lambdas)
+         (add-hook 'after-save-hook 'check-parens nil t)
+
+      (if (memq major-mode
+                '(emacs-lisp-mode inferior-emacs-lisp-mode ielm-mode))
+          (progn
+            (bind-key "<M-return>" 'outline-insert-heading emacs-lisp-mode-map)
+            (bind-key "<tab>" 'my-elisp-indent-or-complete emacs-lisp-mode-map))
+        (turn-on-cldoc-mode)
+
+        (bind-key "<tab>" 'my-lisp-indent-or-complete lisp-mode-map)
+        (bind-key "M-q" 'slime-reindent-defun lisp-mode-map)
+        (bind-key "M-l" 'slime-selector lisp-mode-map))
+
+      (yas-minor-mode 1))
+
+    (add-hook 'emacs-lisp-mode-hook 'my-lisp-mode-hook)))))
 #+end_src
 
 
@@ -704,7 +799,7 @@ Enable 'hightlight-parentheses-mode'.
 (require 'highlight-parentheses)
 #+end_src
 
-** TODO Enable =paredit=.
+** Enable =paredit=.
 #+begin_src emacs-lisp
 (require 'paredit)
 (use-package paredit
@@ -740,8 +835,8 @@ Shen-mode.
 *** TODO Common Lisp
 Enable =slime= for Lisp.
 #+begin_src emacs-lisp
-;(setq inferior-lisp-program "/Applications/Clozure\ CL.app")
-;     (require 'slime-autoloads)
+(setq inferior-lisp-program "/Applications/Clozure\ CL.app")
+;(require 'slime-autoloads)
 #+end_src
 
 *** TODO Racket/Scheme
