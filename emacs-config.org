@@ -212,6 +212,12 @@ Reload =.emacs= file (useful for editing .emacs itself :)
 (global-set-key "\M-e" 'reload-dotemacs)
 #+end_src
 
+* Byte compile emacs lisp
+#+begin_src emacs-lisp
+(defun ue-byte-recompile ()
+  (interactive)
+  (byte-recompile-directory "~/.emacs.d" 0))
+#+end_src
 
 * Core
 ** Zenburn theme
@@ -688,7 +694,15 @@ Syntax highlighting mode for TableGen description files (tablegen-mode.el).
 #+end_src
 
 ** Lisp
-Every Lisp needs a pretty lambda character.
+
+*** Macro step
+#+begin_src emacs-lisp
+(use-package macrostep
+  :bind ("C-c e m" . macrostep-expand))
+#+end_src
+
+
+*** Every Lisp needs a pretty lambda character.
 #+begin_src emacs-lisp
 (defun ue-pretty-lambdas ()
   "Display the word "lambda" by "λ"."
@@ -905,7 +919,7 @@ Setup Erlang mode.
         )
 ;; Some Erlang customizations
 (add-hook 'erlang-mode-hook 'ue-erlang-mode-hook)
-
+(add-to-list 'ac-modes 'erlang-mode)
 
 
 (defun ue-erlang-mode-hook ()
