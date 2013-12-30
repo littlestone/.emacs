@@ -29,7 +29,7 @@ brighter; it simply makes everything else vanish.
 
 (require 'git)
 (require 'cl)
-(require 'ansi-color) 
+(require 'ansi-color)
 #+end_src
 
 * El doc
@@ -84,7 +84,7 @@ Turn of splash screen and the message.
 (setq visible-bell t)
 (fset 'yes-or-no-p 'y-or-n-p)
 #+end_src
-  
+
 * Scroll bar, tool bar and menu bar
 Disable tool bar, the rest is fine on OSX
 #+begin_src emacs-lisp
@@ -102,12 +102,27 @@ Disable tool bar, the rest is fine on OSX
 (global-hl-line-mode +1)
 (defun bw-turn-on-auto-fill ()
   (auto-fill-mode 1))
+(global-font-lock-mode 1)
+(setq require-final-newline t)
+(setq next-line-add-newlines nil)
+(setq whitespace-style '(trailing space-before-tab indentation empty space-after-tab))
+(add-hook 'after-save-hook 'delete-trailing-whitespace)
+
 
 (prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 #+end_src
+
+Also indent automagical by switching RET and LF.
+#+begin_src emacs-lisp
+(setq foo (global-key-binding "\C-m"))
+(global-set-key "\C-m" (global-key-binding "\C-j"))
+(global-set-key "\C-j" foo)
+#+end_src
+
+
 
 * Fill column
 #+begin_src emacs-lisp
@@ -123,7 +138,7 @@ Disable tool bar, the rest is fine on OSX
 #+begin_src emacs-lisp
 (server-start)
 #+end_src
-   
+
 
 * Paths
 Add the ~/bin to the Emacs shell path and fix the PATH variable on OS X
@@ -230,13 +245,13 @@ Reload =.emacs= file (useful for editing .emacs itself :)
 #+begin_src emacs-lisp
 (use-package powerline
   :ensure t
-  :config 
+  :config
   (progn
     (powerline-default-theme)
     (custom-set-variables
       '(powerline-default-separator 'arrow))
     (setq powerline-arrow-shape 'arrow14)
-    ;; modeline items    
+    ;; modeline items
     (setq display-time-day-and-date t)
     (setq display-time-24hr-format t)
     (display-time-mode 1)
@@ -314,7 +329,7 @@ http://magit.github.io/magit/
     (use-package magit-blame)
     (bind-key "C-c C-a" 'magit-just-amend magit-mode-map))
   :config
-  (progn    
+  (progn
     (setq magit-default-tracking-name-function 'magit-default-tracking-name-branch-only)
     (setq magit-set-upstream-on-push t)
     (setq magit-completing-read-function 'magit-ido-completing-read)
@@ -375,7 +390,7 @@ Enable eshell and the smart display with =Meta-e=.
 (use-package dash
   :config (dash-enable-font-lock))
 #+end_src
-  
+
 ** Dired
 #+begin_src emacs-lisp
 (use-package dired-x)
@@ -436,7 +451,7 @@ from my buffer search.
     (use-package smartparens-config)
     (smartparens-global-mode 1)
     (show-smartparens-global-mode 1))
-  :config     
+  :config
   (progn
     (require 'smartparens-config)
     (setq smartparens-strict-mode t)))
@@ -528,7 +543,7 @@ from my buffer search.
        ))
 
     ;; default directory
-    (setq org-directory (expand-file-name "~/org/"))))
+    (setq org-directory (expand-file-name "~/org/") )))
 #+end_src
 
 ** Enable =LaTeX= in Org mode
@@ -584,9 +599,9 @@ Invoke the AUCTeX package.
     (add-hook 'TeX-mode-hook 'TeX-fold-mode)
     (setq LaTeX-csquotes-close-quote "}"
           LaTeX-csquotes-open-quote "\\enquote{")
-    (setq TeX-engine-alist '((pdflatex_sh "pdftlatex shell escape" 
-                              "pdflatex --file-line-error --shell-escape" 
-                              "pdflatex --file-line-error --shell-escape" 
+    (setq TeX-engine-alist '((pdflatex_sh "pdftlatex shell escape"
+                              "pdflatex --file-line-error --shell-escape"
+                              "pdflatex --file-line-error --shell-escape"
                               "pdflatex")))
     ))
 #+end_src
@@ -940,10 +955,10 @@ Setup Erlang mode.
 
 (use-package haskell-mode
       :commands haskell-mode
-      :init 
+      :init
   (add-to-list 'auto-mode-alist'("//.l?hs$" . haskell-mode))
-    :config 
-  (progn 
+    :config
+  (progn
     (use-package inf-haskell)
     (use-package hs-lint)
     (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
@@ -963,9 +978,9 @@ Setup Erlang mode.
     (add-hook 'haskell-mode-hook 'turn-on-haskell-decl-scan)
     (add-hook 'haskell-mode-hook (lambda () (ghc-init) (flymake-mode)))
     (add-hook 'haskell-mode-hook 'pretty-lambdas-)))
-  
+
   (autoload 'ghc-init "ghc" nil t)
-  
+
   (after 'haskell-font-lock
    '(setq haskell-font-lock-symbols-alist
           (delq nil

@@ -27,6 +27,7 @@
 (depends-on "popup")
 (depends-on "powerline")
 (depends-on "rainbow-delimiters")
+(depends-on "s")
 (depends-on "smartparens")
 (depends-on "smex")
 (depends-on "solarized-theme")
