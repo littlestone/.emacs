@@ -977,11 +977,10 @@ Setup Erlang mode.
     (add-hook 'haskell-mode-hook 'capitalized-words-mode)
     (add-hook 'haskell-mode-hook 'turn-on-haskell-decl-scan)
     (add-hook 'haskell-mode-hook (lambda () (ghc-init) (flymake-mode)))
-    (add-hook 'haskell-mode-hook 'pretty-lambdas-)))
+    (add-hook 'haskell-mode-hook 'pretty-lambdas-haskell)))
 
-  (autoload 'ghc-init "ghc" nil t)
 
-  (after 'haskell-font-lock
+(after 'haskell-font-lock
    '(setq haskell-font-lock-symbols-alist
           (delq nil
                 (mapcar (lambda (rewrite)
