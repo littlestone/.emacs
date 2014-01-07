@@ -946,47 +946,47 @@ Setup Erlang mode.
 
 ** Haskell
 #+begin_src emacs-lisp
-(defun pretty-lambdas-haskell ()
-  (font-lock-add-keywords
-     nil `((,(concat "\\(" (regexp-quote "\\") "\\)")
-            (0 (progn (compose-region (match-beginning 1) (match-end 1)
-                                      ,(make-char 'greek-iso8859-7 107))
-                      nil))))))
+  (defun pretty-lambdas-haskell ()
+    (font-lock-add-keywords
+       nil `((,(concat "\\(" (regexp-quote "\\") "\\)")
+              (0 (progn (compose-region (match-beginning 1) (match-end 1)
+                                        ,(make-char 'greek-iso8859-7 107))
+                        nil))))))
 
-(use-package haskell-mode
-      :commands haskell-mode
-      :init
-  (add-to-list 'auto-mode-alist'("//.l?hs$" . haskell-mode))
-    :config
-  (progn
-    (use-package inf-haskell)
-    (use-package hs-lint)
-    (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
-    (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
-    (add-hook 'haskell-mode-hook 'font-lock-mode)
-    (add-hook 'haskell-mode-hook 'turn-on-haskell-font-lock)
-    (setq haskell-font-lock-symbols t)
-    (add-hook 'haskell-mode-hook
-             (lambda ()
-                 (ghc-init)
-                 (flymake-mode)
-                 (require 'auto-complete-config)
-                 (auto-complete-mode t)
-                 (add-to-list 'ac-sources 'ac-source-ghc-mod)))
-    ;; haskell-mode hooks
-    (add-hook 'haskell-mode-hook 'capitalized-words-mode)
-    (add-hook 'haskell-mode-hook 'turn-on-haskell-decl-scan)
-    (add-hook 'haskell-mode-hook (lambda () (ghc-init) (flymake-mode)))
-    (add-hook 'haskell-mode-hook 'pretty-lambdas-haskell)))
+  (use-package haskell-mode
+        :commands haskell-mode
+        :init
+    (add-to-list 'auto-mode-alist'("//.l?hs$" . haskell-mode))
+      :config
+    (progn
+      (use-package inf-haskell)
+      (use-package hs-lint)
+      (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
+      (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
+      (add-hook 'haskell-mode-hook 'font-lock-mode)
+      (add-hook 'haskell-mode-hook 'turn-on-haskell-font-lock)
+      (setq haskell-font-lock-symbols t)
+      (add-hook 'haskell-mode-hook
+               (lambda ()
+                   (ghc-init)
+                   (flymake-mode)
+                   (require 'auto-complete-config)
+                   (auto-complete-mode t)
+                   (add-to-list 'ac-sources 'ac-source-ghc-mod)))
+      ;; haskell-mode hooks
+      (add-hook 'haskell-mode-hook 'capitalized-words-mode)
+      (add-hook 'haskell-mode-hook 'turn-on-haskell-decl-scan)
+      (add-hook 'haskell-mode-hook (lambda () (ghc-init) (flymake-mode)))
+      (add-hook 'haskell-mode-hook 'pretty-lambdas-haskell)))
 
-
-(after 'haskell-font-lock
-   '(setq haskell-font-lock-symbols-alist
-          (delq nil
-                (mapcar (lambda (rewrite)
-                          (if (member (car rewrite) '("->" "<-"))
-                              nil rewrite))
-                        haskell-font-lock-symbols-alist))))
+  (autoload 'ghc-init "ghc" nil t)
+  (after 'haskell-font-lock
+     '(setq haskell-font-lock-symbols-alist
+            (delq nil
+                  (mapcar (lambda (rewrite)
+                            (if (member (car rewrite) '("->" "<-"))
+                                nil rewrite))
+                          haskell-font-lock-symbols-alist))))
 #+end_src
 
 *** Idris
