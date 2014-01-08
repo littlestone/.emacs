@@ -719,107 +719,107 @@ Syntax highlighting mode for TableGen description files (tablegen-mode.el).
 
 *** Every Lisp needs a pretty lambda character.
 #+begin_src emacs-lisp
-(defun ue-pretty-lambdas ()
-  "Display the word "lambda" by "λ"."
-  (font-lock-add-keywords
-   nil
-   `(("\\(lambda\\>\\)"
-      (0
-       (progn
-	 (compose-region (match-beginning 1) (match-end 1) "λ")
-	 'font-lock-keyword-face))))))
+    (defun ue-pretty-lambdas ()
+      "Display the word "lambda" by "λ"."
+      (font-lock-add-keywords
+       nil
+       `(("\\(lambda\\>\\)"
+          (0
+           (progn
+             (compose-region (match-beginning 1) (match-end 1) "λ")
+             'font-lock-keyword-face))))))
 
-(use-package lisp-mode
-  :init
-  (progn
-    (defvar slime-mode nil)
-    (defvar lisp-mode-initialized nil)
+    (use-package lisp-mode
+      :init
+      (progn
+        (defvar slime-mode nil)
+        (defvar lisp-mode-initialized nil)
 
-    (defun initialize-lisp-mode ()
-      (unless lisp-mode-initialized
-        (setq lisp-mode-initialized t)
+        (defun initialize-lisp-mode ()
+          (unless lisp-mode-initialized
+            (setq lisp-mode-initialized t)
 
-        (use-package redshank
-          :diminish redshank-mode)
+            (use-package redshank
+              :diminish redshank-mode)
 
-        (use-package elisp-slime-nav
-          :diminish elisp-slime-nav-mode)
+            (use-package elisp-slime-nav
+              :diminish elisp-slime-nav-mode)
 
-        (use-package edebug)
+            (use-package edebug)
 
-        (use-package eldoc
-          :diminish eldoc-mode
-          :defer t
-          :init
-          (use-package eldoc-extension
-            :disabled t
-            :defer t
-            :init
-            (add-hook 'emacs-lisp-mode-hook
-                      #'(lambda () (require 'eldoc-extension)) t))
+            (use-package eldoc
+              :diminish eldoc-mode
+              :defer t
+              :init
+              (use-package eldoc-extension
+                :disabled t
+                :defer t
+                :init
+                (add-hook 'emacs-lisp-mode-hook
+                          #'(lambda () (require 'eldoc-extension)) t))
 
-          :config
-          (eldoc-add-command 'paredit-backward-delete
-                             'paredit-close-round))
+              :config
+              (eldoc-add-command 'paredit-backward-delete
+                                 'paredit-close-round))
 
-        (use-package cldoc
-          :diminish cldoc-mode)
+            (use-package cldoc
+              :diminish cldoc-mode)
 
-        (use-package ert
-          :commands ert-run-tests-interactively
-          :bind ("C-c e t" . ert-run-tests-interactively))
+            (use-package ert
+              :commands ert-run-tests-interactively
+              :bind ("C-c e t" . ert-run-tests-interactively))
 
-        (use-package elint
-          :commands 'elint-initialize
-          :init
-          (defun elint-current-buffer ()
-            (interactive)
-            (elint-initialize)
-            (elint-current-buffer))
+            (use-package elint
+              :commands 'elint-initialize
+              :init
+              (defun elint-current-buffer ()
+                (interactive)
+                (elint-initialize)
+                (elint-current-buffer))
 
-          :config
-          (progn
-            (add-to-list 'elint-standard-variables 'current-prefix-arg)
-            (add-to-list 'elint-standard-variables 'command-line-args-left)
-            (add-to-list 'elint-standard-variables 'buffer-file-coding-system)
-            (add-to-list 'elint-standard-variables 'emacs-major-version)
-            (add-to-list 'elint-standard-variables 'window-system)))
+              :config
+              (progn
+                (add-to-list 'elint-standard-variables 'current-prefix-arg)
+                (add-to-list 'elint-standard-variables 'command-line-args-left)
+                (add-to-list 'elint-standard-variables 'buffer-file-coding-system)
+                (add-to-list 'elint-standard-variables 'emacs-major-version)
+                (add-to-list 'elint-standard-variables 'window-system)))
 
-        (use-package highlight-cl
-          :init
-          (mapc (function
-                 (lambda (mode-hook)
-                   (add-hook mode-hook
-                             'highlight-cl-add-font-lock-keywords)))
-                lisp-mode-hooks))
+            (use-package highlight-cl
+              :init
+              (mapc (function
+                     (lambda (mode-hook)
+                       (add-hook mode-hook
+                                 'highlight-cl-add-font-lock-keywords)))
+                    lisp-mode-hooks))
 
 
-       (defun my-lisp-mode-hook ()
-         (initialize-lisp-mode)
+           (defun my-lisp-mode-hook ()
+             (initialize-lisp-mode)
 
-         (auto-fill-mode 1)
-         (paredit-mode 1)
-         (redshank-mode 1)
-         (elisp-slime-nav-mode 1)
+             (auto-fill-mode 1)
+             (paredit-mode 1)
+             (redshank-mode 1)
+             (elisp-slime-nav-mode 1)
 
-         (local-set-key (kbd "<return>") 'paredit-newline)
-         (add-hook 'emacs-lisp-mode-hook 'ue-pretty-lambdas)
-         (add-hook 'after-save-hook 'check-parens nil t)
+             (local-set-key (kbd "<return>") 'paredit-newline)
+             (add-hook 'emacs-lisp-mode-hook 'ue-pretty-lambdas)
+             (add-hook 'after-save-hook 'check-parens nil t)
 
-      (if (memq major-mode
-                '(emacs-lisp-mode inferior-emacs-lisp-mode ielm-mode))
-          (progn
-            (bind-key "<M-return>" 'outline-insert-heading emacs-lisp-mode-map)
-            (bind-key "<tab>" 'my-elisp-indent-or-complete emacs-lisp-mode-map))
-        (turn-on-cldoc-mode)
+          (if (memq major-mode
+                    '(emacs-lisp-mode inferior-emacs-lisp-mode ielm-mode))
+              (progn
+                (bind-key "<M-return>" 'outline-insert-heading emacs-lisp-mode-map)
+                (bind-key "<tab>" 'my-elisp-indent-or-complete emacs-lisp-mode-map))
+            (turn-on-cldoc-mode)
 
-        (bind-key "<tab>" 'my-lisp-indent-or-complete lisp-mode-map)
-        (bind-key "M-q" 'slime-reindent-defun lisp-mode-map)
-        (bind-key "M-l" 'slime-selector lisp-mode-map))
+            (bind-key "<tab>" 'my-lisp-indent-or-complete lisp-mode-map)
+            (bind-key "M-q" 'slime-reindent-defun lisp-mode-map)
+            (bind-key "M-l" 'slime-selector lisp-mode-map))
 
-      (yas-minor-mode 1))
+          (yas-minor-mode 1))
 
-    (add-hook 'emacs-lisp-mode-hook 'my-lisp-mode-hook)))))
+        (add-hook 'emacs-lisp-mode-hook 'my-lisp-mode-hook)))))
 #+end_src
 
 
@@ -913,7 +913,6 @@ Setup Erlang mode.
 (setq flymake-log-level 3)
 (erlang-flymake-only-on-save)
 
-;(require 'flymake)
 (defun flymake-erlang-init ()
   (let* ((temp-file (flymake-init-create-temp-buffer-copy
 		     'flymake-create-temp-inplace))
@@ -933,12 +932,10 @@ Setup Erlang mode.
 	(flymake-mode 1)
         )
 ;; Some Erlang customizations
-(add-hook 'erlang-mode-hook 'ue-erlang-mode-hook)
 (add-to-list 'ac-modes 'erlang-mode)
 
-
 (defun ue-erlang-mode-hook ()
-(flymake-mode 1))
+  (flymake-mode 1))
 
 (add-hook 'erlang-mode-hook 'ue-erlang-mode-hook)
 #+end_src
