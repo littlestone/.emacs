@@ -682,7 +682,7 @@ from the namespace declaration iff the open brace sits on a line by itself."
 **** Clang
 Autocomplete with =clang=.
 #+begin_src emacs-lisp
-(add-to-list 'load-path "~/.emacs.d" "~/Dev/svn/llvm/tools/clang/utils")
+(add-to-list 'load-path "~/.emacs.d" "~/Dev/svn/llvm/trunk/tools/clang/utils")
 ;;(setq load-path (cons "~/.emacs.d" "~/Dev/svn/llvm/trunk/tools/clang/utils"))
 ;;(setq ac-sources '(ac-source-clang-complete))
 ;;(setq ac-auto-start nil)
@@ -692,14 +692,14 @@ Autocomplete with =clang=.
 Syntax highlighting mode for LLVM assembly files.
 #+begin_src emacs-lisp
   (setq load-path
-    (cons (expand-file-name "~/Dev/svn/llvm/utils/emacs") load-path))
+    (cons (expand-file-name "~/Dev/svn/llvm/trunk/utils/emacs") load-path))
   (require 'llvm-mode)
 #+end_src
 
 Syntax highlighting mode for TableGen description files (tablegen-mode.el).
 #+begin_src emacs-lisp
   (setq load-path
-    (cons (expand-file-name "~/Dev/svn/llvm/utils/emacs/tablegen-mode.el") load-path))
+    (cons (expand-file-name "~/Dev/svn/llvm/trunk/utils/emacs/tablegen-mode.el") load-path))
   (require 'tablegen-mode)
 #+end_src
 
@@ -993,9 +993,10 @@ Setup Erlang mode.
 
 *** TODO Agda
 #+begin_src emacs-lisp
-'(agda2-include-dirs (quote ("/Users/ulf/Dev/haskell/lib-0.6/src")))
-(load-file (let ((coding-system-for-read 'utf-8))
-                (shell-command-to-string "agda-mode locate")))
+;;'(agda2-include-dirs (quote ("/Users/ulf/Dev/haskell/lib-0.6/src")))
+;;
+;(load-file (let ((coding-system-for-read 'utf-8))
+;;                (shell-command-to-string "agda-mode locate")))
 #+end_src
 
 ** TODO Ocaml
