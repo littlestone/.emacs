@@ -234,6 +234,17 @@ Reload =.emacs= file (useful for editing .emacs itself :)
   (byte-recompile-directory "~/.emacs.d" 0))
 #+end_src
 
+
+* Discover
+#+begin_src emacs-lisp
+;(use-package discover
+;  :init
+;  (progn
+;  (global-discover-mode 1)
+;  (use-package makey)))
+#+end_src
+
+
 * Core
 ** Zenburn theme
 #+begin_src emacs-lisp
@@ -993,6 +1004,11 @@ Setup Erlang mode.
 
 *** TODO Agda
 #+begin_src emacs-lisp
+
+;(use-package agda2-mode
+;  :mode ("\\.agda\\'" . agda2-mode)
+;  :init
+;  (use-package agda-input))
 ;;'(agda2-include-dirs (quote ("/Users/ulf/Dev/haskell/lib-0.6/src")))
 ;;
 ;(load-file (let ((coding-system-for-read 'utf-8))
