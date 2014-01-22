@@ -164,7 +164,7 @@ Enable ANSI colors for the shell by default.
 * Display settings
 Set the default font, and set transparency.
 #+begin_src emacs-lisp
-(set-default-font "Menlo-10")
+(set-frame-font "Menlo-10")
 (setq mac-allow-anti-aliasing t)
 (set-frame-parameter (selected-frame) 'alpha '(96 84))
 (add-to-list 'default-frame-alist '(alpha 96 84))
@@ -290,8 +290,8 @@ Winner mode is great when you depend a lot on working with Emacs windows.
   :init
   (progn
     (let ((snippets-dir (f-expand "snippets" user-emacs-directory)))
-      (yas/load-directory snippets-dir)
-      (setq yas/snippet-dirs snippets-dir))
+      (yas-load-directory snippets-dir)
+      (setq yas-snippet-dirs snippets-dir))
     (yas-global-mode 1)
     (setq-default yas/prompt-functions '(yas/ido-prompt))))
 #+end_src
@@ -314,7 +314,7 @@ Winner mode is great when you depend a lot on working with Emacs windows.
 ** Popwin
 #+begin_src emacs-lisp
 (use-package popwin
-  :config (setq display-buffer-function 'popwin:display-buffer))
+  :config (setq display-buffer-alist 'popwin:display-buffer))
 #+end_src
 
 ** Projectile
@@ -944,10 +944,6 @@ Setup Erlang mode.
         )
 ;; Some Erlang customizations
 (add-to-list 'ac-modes 'erlang-mode)
-
-(defun ue-erlang-mode-hook ()
-  (flymake-mode 1))
-
 (add-hook 'erlang-mode-hook 'ue-erlang-mode-hook)
 #+end_src
 
