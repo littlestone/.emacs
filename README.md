@@ -1,2 +1,2 @@
 * Personal Emacs Configuration
-Using Cask and pallet and MELPA 
+Using Cask, Pallet and MELPA
