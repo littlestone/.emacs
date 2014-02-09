@@ -29,6 +29,7 @@ brighter; it simply makes everything else vanish.
 
 (require 'git)
 (require 'cl)
+(require 'cl-lib)
 (require 'ansi-color)
 #+end_src
 
@@ -396,7 +397,7 @@ Enable eshell and the smart display with =Meta-e=.
 ))
 #+end_src
 
-** Dash
+** Dashé
 #+begin_src emacs-lisp
 (use-package dash
   :config (dash-enable-font-lock))
@@ -731,7 +732,7 @@ Syntax highlighting mode for TableGen description files (tablegen-mode.el).
 *** Every Lisp needs a pretty lambda character.
 #+begin_src emacs-lisp
     (defun ue-pretty-lambdas ()
-      "Display the word "lambda" by "λ"."
+      "Display the word \"lambda\" by \"λ\"."
       (font-lock-add-keywords
        nil
        `(("\\(lambda\\>\\)"
@@ -802,7 +803,7 @@ Syntax highlighting mode for TableGen description files (tablegen-mode.el).
                      (lambda (mode-hook)
                        (add-hook mode-hook
                                  'highlight-cl-add-font-lock-keywords)))
-                    lisp-mode-hooks))
+                    lisp-mode-hook))
 
 
            (defun my-lisp-mode-hook ()
@@ -839,7 +840,7 @@ Enable 'hightlight-parentheses-mode'.
 (require 'highlight-parentheses)
 #+end_src
 
-** Enable =paredit=.
+*** Enable =paredit=.
 #+begin_src emacs-lisp
 (require 'paredit)
 (use-package paredit
@@ -885,16 +886,16 @@ Enable =geiser= and =quack= for scheme/racket.
 (setq geiser-active-implementations '(racket))
 
 ;; quack mode settings for scheme
-(autoload 'quack "quack" nil t)
+;(autoload 'quack "quack" nil t)
 
 ;; This hook lets you use your theme colours instead of quack's ones.
-(defun scheme-mode-quack-hook ()
-  (setq quack-global-menu-p nil)
-  ;;(require 'quack)
-  (quack-pretty-lambda-p t)
-  (setq quack-fontify-style 'emacs))
+;(defun scheme-mode-quack-hook ()
+;  (setq quack-global-menu-p nil)
+;  ;;(require 'quack)
+;  (quack-pretty-lambda-p t)
+;  (setq quack-fontify-style 'emacs))
 
-(add-hook 'scheme-mode-hook 'scheme-mode-quack-hook)
+;(add-hook 'scheme-mode-hook 'scheme-mode-quack-hook)
 
 #+end_src
 
