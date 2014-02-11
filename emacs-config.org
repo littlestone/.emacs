@@ -197,15 +197,15 @@ Set the default font, and set transparency.
 (if (window-system)
   (set-frame-width (selected-frame) 200))
 
-(defun lh-get-height-max ()
+(if (window-system) (defun lh-get-height-max ()
   (- (/ (cadddr (display-usable-bounds))
 	(frame-char-height))
-     2))
+     2)))
 
-(defun lh-max-frames ()
+(if (window-system) (defun lh-max-frames ()
   (interactive)
   (modify-all-frames-parameters (list (cons 'height (lh-get-height-max)))))
-(lh-max-frames)
+(lh-max-frames))
 #+end_src
 
 
@@ -397,7 +397,7 @@ Enable eshell and the smart display with =Meta-e=.
 ))
 #+end_src
 
-** Dashé
+** Dash
 #+begin_src emacs-lisp
 (use-package dash
   :config (dash-enable-font-lock))
