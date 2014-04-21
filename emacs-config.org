@@ -13,6 +13,10 @@ brighter; it simply makes everything else vanish.
 * Set emacs start time
 #+begin_src emacs-lisp
 (defconst emacs-start-time (current-time))
+
+(dotimes-with-progress-reporter (k 500) "Collecting mana for Emacs..."
+(sleep-for 0.01))
+
 #+end_src
 
 * Set personal info explicit.
@@ -20,6 +24,28 @@ brighter; it simply makes everything else vanish.
 (setq user-full-name "Ulf Ejlertsson")
 (setq user-mail-address "ulf.ejlertsson@gmail.com")
 #+end_src
+
+
+* GNUS
+#+begin_src emacs-lisp
+  (setq
+
+ send-mail-function 'smtpmail-send-it
+ message-send-mail-function 'smtpmail-send-it
+ user-mail-address "ulf.ejlertsson@me.com"
+ user-full-name "Ulf Ejlertsson"
+ smtpmail-starttls-credentials '(("smtp.mail.me.com" 587 nil nil))
+ smtpmail-auth-credentials  (expand-file-name "~/.authinfo")
+ smtpmail-default-smtp-server "smtp.mail.me.com"
+ smtpmail-smtp-server "smtp.mail.me.com"
+ smtpmail-smtp-service 587
+ smtpmail-debug-info t
+ starttls-extra-arguments nil
+ starttls-gnutls-program (executable-find "gnutls-cli")
+ smtpmail-warn-about-unknown-extensions t
+ starttls-use-gnutls t)
+#+end_src
+
 
 * Useful packages
 #+begin_src emacs-lisp
@@ -645,50 +671,52 @@ SCons
 
 *** C
 #+begin_src emacs-lisp
-(add-hook 'c-mode-common-hook 'turn-on-auto-fill)
+  (add-hook 'c-mode-common-hook 'turn-on-auto-fill)
 
-(add-hook 'c-mode-hook (function (lambda()
-                  (c-set-style "bsd")
-                  (setq c-basic-offset 8)
-                  (setq indent-tabs-mode nil)
-                  ) ) )
+  (add-hook 'c-mode-hook (function (lambda()
+                    (c-set-style "bsd")
+                    (setq c-basic-offset 8)
+                    (setq indent-tabs-mode nil)
+                    (local-set-key [return] 'newline-and-indent)
+                    ) ) )
 #+end_src
 
 *** C++
 #+begin_src emacs-lisp
-(defun ue-c-namespace-open-indent (langelem)
-  "Used with c-set-offset, indents namespace opening braces to the same indentation as the line on which the namespace declaration starts."
-  (save-excursion
-    (goto-char (cdr langelem))
-    (let ((column (current-column)))
-      (beginning-of-line)
-      (skip-chars-forward " \t")
-      (- (current-column) column)))
-  )
+  (defun ue-c-namespace-open-indent (langelem)
+    "Used with c-set-offset, indents namespace opening braces to the same indentation as the line on which the namespace declaration starts."
+    (save-excursion
+      (goto-char (cdr langelem))
+      (let ((column (current-column)))
+        (beginning-of-line)
+        (skip-chars-forward " \t")
+        (- (current-column) column)))
+    )
 
-(defun ue-c-namespace-indent (langelem)
-  "Used with c-set-offset, indents namespace scope elements 2 spaces
-from the namespace declaration iff the open brace sits on a line by itself."
-  (save-excursion
-    (if (progn (goto-char (cdr langelem))
-               (setq column (current-column))
-               (end-of-line)
-               (while (and (search-backward "{" nil t)
-                           (assoc 'incomment (c-guess-basic-syntax))))
-               (skip-chars-backward " \t")
-               (bolp))
-        2)))
+  (defun ue-c-namespace-indent (langelem)
+    "Used with c-set-offset, indents namespace scope elements 2 spaces
+  from the namespace declaration iff the open brace sits on a line by itself."
+    (save-excursion
+      (if (progn (goto-char (cdr langelem))
+                 (setq column (current-column))
+                 (end-of-line)
+                 (while (and (search-backward "{" nil t)
+                             (assoc 'incomment (c-guess-basic-syntax))))
+                 (skip-chars-backward " \t")
+                 (bolp))
+          2)))
 
-(add-hook 'c++-mode-common-hook ' turn-on-auto-fill)
+  (add-hook 'c++-mode-common-hook ' turn-on-auto-fill)
 
-(add-hook 'c++-mode-hook (function (lambda()
-                    (c-set-style "bsd")
-		        (c-set-offset 'innamespace 'ue-c-namespace-indent)
-			    (c-set-offset 'namespace-open 'ue-c-namespace-open-indent)
-			        (c-set-offset 'access-label -3)
-                    (setq c-basic-offset 4)
-                    (setq indent-tabs-mode nil)
-                    ) ))
+  (add-hook 'c++-mode-hook (function (lambda()
+                      (c-set-style "bsd")
+                          (c-set-offset 'innamespace 'ue-c-namespace-indent)
+                              (c-set-offset 'namespace-open 'ue-c-namespace-open-indent)
+                                  (c-set-offset 'access-label -3)
+                      (setq c-basic-offset 4)
+                      (setq indent-tabs-mode nil)
+                      (local-set-key [return] 'newline-and-indent)
+                      ) ))
 #+end_src
 
 **** Clang
@@ -718,6 +746,8 @@ Syntax highlighting mode for TableGen description files (tablegen-mode.el).
 *** Objective C
 #+begin_src emacs-lips
 (autoload 'objc-mode "cc-mode" "Objective-C Editing Mode" t)
+ (local-set-key [return] 'newline-and-indent)
+(define-key c-mode-base-map (kbd "RET") 'newline-and-indent)
 #+end_src
 
 ** Lisp
