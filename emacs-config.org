@@ -1,3 +1,5 @@
+
+
 #+TITLE: Emacs Configuration
 #+AUTHOR: Ulf Ejlertsson
 #+EMAIL: ulf.ejlertsson
@@ -1043,8 +1045,40 @@ Setup Erlang mode.
 #+end_src
 
 ** TODO Ocaml
+Using [[https://opam.ocaml.org]] for most of the OCaml tools.
+=$ brew cask install xquartz=
+=$ brew install opam --without-aspcud=
+
+Initialising the OPAM package manager
+=$ opam init=
+=$ eval `opam config env`=
+
+Install some useful libraries.
+=$ opam install core utop=
+
+Install merlin
+=$ opam install merlin=
+
+
+
+
 #+begin_src emacs-lisp
-(add-to-list 'auto-mode-alist '("\\.ml[iylp]?" . tuareg-mode))
+
+;; Setup environment variables using opam
+(dolist (var (car (read-from-string (shell-command-to-string "opam config env --sexp"))))
+  (setenv (car var) (cadr var)))
+
+;; Update the emacs path
+(setq exec-path (split-string (getenv "PATH") path-separator))
+
+;; Update the emacs load path
+(push (concat (getenv "OCAML_TOPLEVEL_PATH") "/../../share/emacs/site-lisp") load-path)
+
+;; Automatically load utop.el
+(autoload 'utop "utop" "Toplevel for OCaml" t)
+
+
+;;(add-to-list 'auto-mode-alist '("\\.ml[iylp]?" . tuareg-mode))
 (autoload 'tuareg-mode "tuareg" "Major mode for editing OCaml code" t)
 (autoload 'tuareg-run-ocaml "tuareg" "Run an inferior OCaml process." t)
 (autoload 'ocamldebug "ocamldebug" "Run the OCaml debugger" t)
@@ -1065,13 +1099,41 @@ Setup Erlang mode.
 ;; No indentation after `in' keywords.
 (setq tuareg-in-indent 0)
 
+(autoload 'utop-setup-ocaml-buffer "utop" "Toplevel for OCaml" t)
+(add-hook 'tuareg-mode-hook 'utop-setup-ocaml-buffer)
+(add-hook 'tuareg-mode-hook 'merlin-mode)
+(setq merlin-use-auto-complete-mode t)
+(setq merlin-error-after-save nil)
+
 (add-hook 'tuareg-mode-hook
 	  ;; Turn on auto-fill minor mode.
 	  (lambda () (auto-fill-mode 1)))
+
+(setq opam-share (substring (shell-command-to-string "opam config var share") 0 -1))
+(add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
+(require 'merlin)
+
+;; Enable Merlin for ML buffers
+(add-hook 'tuareg-mode-hook 'merlin-mode)
+
+;; So you can do it on a mac, where `C-<up>` and `C-<down>` are used
+;; by spaces.
+(define-key merlin-mode-map
+  (kbd "C-c <up>") 'merlin-type-enclosing-go-up)
+(define-key merlin-mode-map
+  (kbd "C-c <down>") 'merlin-type-enclosing-go-down)
+(set-face-background 'merlin-type-face "#88FF44")
+
+;; -- enable auto-complete -------------------------------
+;; Not required, but useful along with merlin-mode
+(require 'auto-complete)
+(add-hook 'tuareg-mode-hook 'auto-complete-mode)
+
 #+end_src
 
 
 *** TODO Coq
+=$ opam install coq=
 #+begin_src emacs-lisp
 (setq auto-mode-alist (remove (rassoc 'verilog-mode auto-mode-alist) auto-mode-alist))
 ;;(load-file (concat site-packages-dir "/ProofGeneral/generic/proof-site.el"))
