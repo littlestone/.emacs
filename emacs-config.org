@@ -12,14 +12,45 @@ brighter; it simply makes everything else vanish.
 -- Neal Stephenson, "In the Beginning was the Command Line"
 #+end_quote
 
+* Setting up the Emacs server
+#+begin_src emacs-lisp
+;;(server-start)
+(load "server")
+(unless (server-running-p) (server-start))
+#+end_src
+
+
 * Set emacs start time
 #+begin_src emacs-lisp
 (defconst emacs-start-time (current-time))
 
-(dotimes-with-progress-reporter (k 500) "Collecting mana for Emacs..."
-(sleep-for 0.01))
+;;(dotimes-with-progress-reporter (k 500) "Collecting mana for Emacs..."
+;;(sleep-for 0.01))
 
 #+end_src
+
+
+* Spash screen
+Turn of splash screen and the message.
+#+begin_src emacs-lisp
+(setq inhibit-splash-screen t
+      initial-scratch-message nil)
+#+end_src
+
+* No beeping and 'y' for yes
+#+begin_src emacs-lisp
+(setq visible-bell t)
+(fset 'yes-or-no-p 'y-or-n-p)
+#+end_src
+
+* Scroll bar, tool bar and menu bar
+Disable tool bar, the rest is fine on OSX
+#+begin_src emacs-lisp
+(when window-system
+  (tool-bar-mode -1))
+#+end_src
+
+
 
 * Set personal info explicit.
 #+begin_src emacs-lisp
@@ -85,9 +116,10 @@ Make Emacs reload changed files if you haven't also changed them in Emacs.
 
 * Remap meta key on OS X
 #+begin_src emacs-lisp
-(setq mac-option-modifier nil
-      mac-command-modifier 'meta
-      x-select-enable-clipboard t)
+(when (eq system-type 'darwin)
+  (setq mac-option-modifier nil
+        mac-command-modifier 'meta
+        x-select-enable-clipboard t))
 #+end_src
 
 * Useful macro
@@ -100,26 +132,13 @@ from: http://milkbox.net/note/single-file-master-emacs-configuration/
      '(progn ,@body)))
 #+end_src
 
-
-* Spash screen
-Turn of splash screen and the message.
 #+begin_src emacs-lisp
-(setq inhibit-splash-screen t
-      initial-scratch-message nil)
+(defun add-hook-to-modes (modes hook)
+  (dolist (mode modes)
+    (add-hook (intern (concat (symbol-name mode) "-mode-hook"))
+              hook)))
 #+end_src
 
-* No beeping and 'y' for yes
-#+begin_src emacs-lisp
-(setq visible-bell t)
-(fset 'yes-or-no-p 'y-or-n-p)
-#+end_src
-
-* Scroll bar, tool bar and menu bar
-Disable tool bar, the rest is fine on OSX
-#+begin_src emacs-lisp
-(when window-system
-  (tool-bar-mode -1))
-#+end_src
 
 * Useful defaults
 #+begin_src emacs-lisp
@@ -156,6 +175,7 @@ Also indent automagical by switching RET and LF.
 * Fill column
 #+begin_src emacs-lisp
 (use-package fill-column-indicator
+  :ensure
   :init
   (progn
     (setq-default fci-rule-column 80)
@@ -163,10 +183,6 @@ Also indent automagical by switching RET and LF.
     (fci-mode)))
 #+end_src
 
-* Setting up the Emacs server
-#+begin_src emacs-lisp
-(server-start)
-#+end_src
 
 
 * Paths
@@ -277,7 +293,8 @@ Reload =.emacs= file (useful for editing .emacs itself :)
 * Core
 ** Zenburn theme
 #+begin_src emacs-lisp
-(use-package zenburn-theme)
+(use-package zenburn-theme
+  :defer t)
 #+end_src
 
 
@@ -499,9 +516,11 @@ from my buffer search.
 
 ** Rainbow delimiters
 #+begin_src emacs-lisp
-(use-package rainbow-delimiters)
-(after 'rainbow-delimiters-autoloads
-  (add-hook 'prog-mode-hook 'rainbow-delimiters-mode-enable))
+(use-package rainbow-delimiters
+  :config (global-rainbow-delimiters-mode t)
+  :ensure t)
+;;(after 'rainbow-delimiters-autoloads
+;;  (add-hook 'prog-mode-hook 'rainbow-delimiters-mode-enable))
 #+end_src
 
 ** Recentf
@@ -556,6 +575,7 @@ from my buffer search.
 #+begin_src emacs-lisp
 (require 'ob-tangle)
 (use-package org
+  :ensure
   :mode ("\\.org$" . org-mode)
   :config
   (progn
@@ -991,13 +1011,15 @@ Setup Erlang mode.
                         nil))))))
 
   (use-package haskell-mode
+        :ensure
         :commands haskell-mode
         :init
     (add-to-list 'auto-mode-alist'("//.l?hs$" . haskell-mode))
       :config
-    (progn
-      (use-package inf-haskell)
-      (use-package hs-lint)
+      (progn
+        (use-package inf-haskell)
+        (use-package hs-lint)
+      ;; haskell-mode hooks
       (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
       (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
       (add-hook 'haskell-mode-hook 'font-lock-mode)
@@ -1010,7 +1032,6 @@ Setup Erlang mode.
                    (require 'auto-complete-config)
                    (auto-complete-mode t)
                    (add-to-list 'ac-sources 'ac-source-ghc-mod)))
-      ;; haskell-mode hooks
       (add-hook 'haskell-mode-hook 'capitalized-words-mode)
       (add-hook 'haskell-mode-hook 'turn-on-haskell-decl-scan)
       (add-hook 'haskell-mode-hook (lambda () (ghc-init) (flymake-mode)))
@@ -1045,6 +1066,33 @@ Setup Erlang mode.
 #+end_src
 
 ** TODO Ocaml
+*** ocaml via tuareg-mode
+#+begin_src
+
+
+(use-package utop
+  :ensure)
+
+(use-package merlin
+  :ensure)
+
+(use-package tuareg
+  :ensure
+  :config
+  (add-hook 'tuareg-mode-hook 'tuareg-imenu-set-imenu)
+  (setq auto-mode-alist
+        (append '(("\\.ml[ily]?$" . tuareg-mode)
+                  ("\\.topml$" . tuareg-mode))
+                auto-mode-alist))
+  (autoload 'utop-setup-ocaml-buffer "utop" "Toplevel for OCaml" t)
+  (add-hook 'tuareg-mode-hook 'utop-setup-ocaml-buffer)
+  (add-hook 'tuareg-mode-hook 'merlin-mode)
+  (setq merlin-use-auto-complete-mode t)
+  (setq merlin-error-after-save nil)
+  )
+#+end_src
+
+
 Using [[https://opam.ocaml.org]] for most of the OCaml tools.
 =$ brew cask install xquartz=
 =$ brew install opam --without-aspcud=
